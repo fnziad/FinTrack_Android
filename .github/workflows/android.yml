@@ -19,9 +19,7 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3
+        cache: 'gradle'
 
     - name: Create .env from example
       run: cp -n .env.example .env || touch .env
@@ -43,4 +41,5 @@ jobs:
       with:
         name: FinTrack-Debug-APK
         path: app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 7
 
