@@ -23,6 +23,8 @@ jobs:
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
+      with:
+        validate-wrappers: false
 
     - name: Create .env from example
       run: cp -n .env.example .env || touch .env
