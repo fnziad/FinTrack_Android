@@ -97,7 +97,15 @@ fun MainAppStructure(viewModel: ExpenseViewModel) {
                     NavigationBarItem(
                         selected = selected,
                         onClick = {
-                            if (currentRoute != screen.route) {
+                            if (screen.route == Screen.Dashboard.route) {
+                                val popped = navController.popBackStack(Screen.Dashboard.route, inclusive = false)
+                                if (!popped && currentRoute != Screen.Dashboard.route) {
+                                    navController.navigate(Screen.Dashboard.route) {
+                                        popUpTo(navController.graph.findStartDestination().id)
+                                        launchSingleTop = true
+                                    }
+                                }
+                            } else if (currentRoute != screen.route) {
                                 navController.navigate(screen.route) {
                                     popUpTo(navController.graph.findStartDestination().id) {
                                         saveState = true
