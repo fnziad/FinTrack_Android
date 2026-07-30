@@ -38,11 +38,15 @@ import com.example.ui.theme.BentoCardBorder
 import com.example.ui.theme.CoralExpense
 import com.example.ui.theme.EmeraldGreen
 
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.text.style.TextOverflow
+
 @Composable
 fun DoughnutChart(
     spentAmount: Double,
     remainingAmount: Double,
     currencySymbol: String,
+    onChartClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val total = (spentAmount + remainingAmount).coerceAtLeast(1.0)
@@ -58,7 +62,10 @@ fun DoughnutChart(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .border(1.dp, BentoCardBorder, RoundedCornerShape(24.dp)),
+            .border(1.dp, BentoCardBorder, RoundedCornerShape(24.dp))
+            .then(
+                if (onChartClick != null) Modifier.clickable { onChartClick() } else Modifier
+            ),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
@@ -69,25 +76,38 @@ fun DoughnutChart(
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Budget Allocation",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.fillMaxWidth()
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Budget Allocation",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                if (onChartClick != null) {
+                    Text(
+                        text = "View Ledger",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.size(200.dp)
+                modifier = Modifier.size(190.dp)
             ) {
                 val remainingColor = EmeraldGreen
                 val spentColor = CoralExpense
-                val strokeWidthDp = 28.dp
+                val strokeWidthDp = 24.dp
 
-                Canvas(modifier = Modifier.size(180.dp)) {
+                Canvas(modifier = Modifier.size(170.dp)) {
                     val strokeWidth = strokeWidthDp.toPx()
 
                     // Remaining background arc
@@ -112,7 +132,10 @@ fun DoughnutChart(
                 }
 
                 // Center Text
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(horizontal = 24.dp)
+                ) {
                     Text(
                         text = "Spent",
                         style = MaterialTheme.typography.labelMedium,
@@ -120,15 +143,19 @@ fun DoughnutChart(
                     )
                     Text(
                         text = "$currencySymbol${spentAmount.toInt()}",
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.ExtraBold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = "${(spentRatio * 100).toInt()}% of budget",
                         style = MaterialTheme.typography.labelSmall,
                         color = CoralExpense,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
@@ -138,19 +165,24 @@ fun DoughnutChart(
             // Chart Legends
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                LegendItem(
-                    color = EmeraldGreen,
-                    label = "Remaining",
-                    value = "$currencySymbol${remainingAmount.coerceAtLeast(0.0).toInt()} (${(remainingRatio * 100).toInt()}%)"
-                )
-                LegendItem(
-                    color = CoralExpense,
-                    label = "Spent",
-                    value = "$currencySymbol${spentAmount.toInt()} (${(spentRatio * 100).toInt()}%)"
-                )
+                Box(modifier = Modifier.weight(1f)) {
+                    LegendItem(
+                        color = EmeraldGreen,
+                        label = "Remaining",
+                        value = "$currencySymbol${remainingAmount.coerceAtLeast(0.0).toInt()} (${(remainingRatio * 100).toInt()}%)"
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Box(modifier = Modifier.weight(1f)) {
+                    LegendItem(
+                        color = CoralExpense,
+                        label = "Spent",
+                        value = "$currencySymbol${spentAmount.toInt()} (${(spentRatio * 100).toInt()}%)"
+                    )
+                }
             }
         }
     }
@@ -165,22 +197,25 @@ private fun LegendItem(
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(
             modifier = Modifier
-                .size(12.dp)
+                .size(10.dp)
                 .clip(CircleShape)
                 .background(color)
         )
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(6.dp))
         Column {
             Text(
                 text = label,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1
             )
             Text(
                 text = value,
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }

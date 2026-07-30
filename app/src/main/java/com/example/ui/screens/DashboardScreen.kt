@@ -60,10 +60,17 @@ import com.example.ui.theme.BentoIndigoPrimary
 import com.example.ui.theme.BentoRose
 import com.example.ui.viewmodel.ExpenseViewModel
 
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.text.style.TextOverflow
+
 @Composable
 fun DashboardScreen(
     viewModel: ExpenseViewModel,
     onAddExpenseClick: () -> Unit,
+    onNavigateToLedger: () -> Unit = {},
+    onNavigateToLoans: () -> Unit = {},
+    onNavigateToSavings: () -> Unit = {},
+    onNavigateToSettings: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.dashboardUiState.collectAsState()
@@ -92,13 +99,15 @@ fun DashboardScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                     Text(
                         text = "WELCOME, ${profileName.uppercase()}",
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        letterSpacing = 1.sp
+                        letterSpacing = 1.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = "FinTrack",
@@ -108,7 +117,10 @@ fun DashboardScreen(
                     )
                 }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { onNavigateToSettings() }
+                ) {
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(12.dp))
@@ -146,11 +158,11 @@ fun DashboardScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                // Hero Salary Countdown Bento Box (2x2 proportion)
+                // Hero Salary Countdown Bento Box
                 Card(
                     modifier = Modifier
                         .weight(1f)
-                        .height(160.dp)
+                        .clickable { onNavigateToSettings() }
                         .testTag("stat_days_until_salary"),
                     shape = RoundedCornerShape(24.dp),
                     colors = CardDefaults.cardColors(containerColor = BentoIndigoPrimary),
@@ -158,7 +170,7 @@ fun DashboardScreen(
                 ) {
                     Column(
                         modifier = Modifier
-                            .fillMaxSize()
+                            .fillMaxWidth()
                             .padding(16.dp),
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
@@ -169,20 +181,26 @@ fun DashboardScreen(
                             modifier = Modifier.size(28.dp)
                         )
 
+                        Spacer(modifier = Modifier.height(16.dp))
+
                         Column {
                             Text(
                                 text = "${uiState.daysUntilSalary}",
-                                style = MaterialTheme.typography.headlineLarge.copy(fontSize = 38.sp),
+                                style = MaterialTheme.typography.headlineLarge,
                                 fontWeight = FontWeight.Black,
                                 fontStyle = FontStyle.Italic,
-                                color = Color.White
+                                color = Color.White,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                             Text(
                                 text = "DAYS UNTIL SALARY",
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White.copy(alpha = 0.8f),
-                                letterSpacing = 0.5.sp
+                                letterSpacing = 0.5.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }
@@ -190,25 +208,23 @@ fun DashboardScreen(
 
                 // Column of 2 Mini Bento Cards (Initial Budget & Wallet Cash)
                 Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(160.dp),
+                    modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     // Initial Budget Card
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f)
                             .border(1.dp, BentoCardBorder, RoundedCornerShape(20.dp))
+                            .clickable { onNavigateToSettings() }
                             .testTag("stat_initial_amount"),
                         shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                     ) {
                         Row(
                             modifier = Modifier
-                                .fillMaxSize()
+                                .fillMaxWidth()
                                 .padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -226,8 +242,8 @@ fun DashboardScreen(
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
-                            Spacer(modifier = Modifier.width(10.dp))
-                            Column {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = "BUDGET",
                                     style = MaterialTheme.typography.labelSmall,
@@ -238,7 +254,9 @@ fun DashboardScreen(
                                     text = "$symbol${uiState.initialAmount.toInt()}",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.ExtraBold,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
                         }
@@ -248,16 +266,16 @@ fun DashboardScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f)
                             .border(1.dp, BentoCardBorder, RoundedCornerShape(20.dp))
+                            .clickable { onNavigateToSettings() }
                             .testTag("stat_wallet_cash"),
                         shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                     ) {
                         Row(
                             modifier = Modifier
-                                .fillMaxSize()
+                                .fillMaxWidth()
                                 .padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -275,8 +293,8 @@ fun DashboardScreen(
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
-                            Spacer(modifier = Modifier.width(10.dp))
-                            Column {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = "WALLET CASH",
                                     style = MaterialTheme.typography.labelSmall,
@@ -287,7 +305,9 @@ fun DashboardScreen(
                                     text = "$symbol${uiState.walletCash.toInt()}",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.ExtraBold,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
                         }
@@ -307,9 +327,10 @@ fun DashboardScreen(
                     modifier = Modifier
                         .weight(1f)
                         .border(1.dp, BentoCardBorder, RoundedCornerShape(24.dp))
+                        .clickable { onNavigateToLedger() }
                         .testTag("stat_spent_today"),
                     shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -322,7 +343,10 @@ fun DashboardScreen(
                                 text = "SPENT TODAY",
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.weight(1f),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                             Box(
                                 modifier = Modifier
@@ -345,7 +369,9 @@ fun DashboardScreen(
                             text = "$symbol${uiState.spentToday.toInt()}",
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.ExtraBold,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
 
                         Spacer(modifier = Modifier.height(10.dp))
@@ -359,7 +385,9 @@ fun DashboardScreen(
                             text = "$symbol${uiState.totalSpentTillToday.toInt()}",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = BentoRose
+                            color = BentoRose,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
@@ -369,9 +397,10 @@ fun DashboardScreen(
                     modifier = Modifier
                         .weight(1f)
                         .border(1.dp, BentoCardBorder, RoundedCornerShape(24.dp))
+                        .clickable { onNavigateToLedger() }
                         .testTag("stat_daily_avg"),
                     shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -379,7 +408,9 @@ fun DashboardScreen(
                             text = "DAILY AVG SPENT",
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
 
                         Spacer(modifier = Modifier.height(6.dp))
@@ -388,7 +419,9 @@ fun DashboardScreen(
                             text = "$symbol${uiState.dailyAvgSpent.toInt()}",
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.ExtraBold,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
 
                         Spacer(modifier = Modifier.height(10.dp))
@@ -402,7 +435,9 @@ fun DashboardScreen(
                             text = "$symbol${uiState.targetAvg.toInt()}",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = BentoEmerald
+                            color = BentoEmerald,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
@@ -414,6 +449,7 @@ fun DashboardScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clickable { onNavigateToLoans() }
                     .testTag("stat_total_spent"),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = BentoDarkCard),
@@ -425,7 +461,10 @@ fun DashboardScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f)
+                        ) {
                             Icon(
                                 imageVector = Icons.Default.Payments,
                                 contentDescription = null,
@@ -438,7 +477,9 @@ fun DashboardScreen(
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = BentoIndigoContainer,
-                                letterSpacing = 0.5.sp
+                                letterSpacing = 0.5.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
 
@@ -455,7 +496,7 @@ fun DashboardScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Column {
+                        Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = "I Owe (Borrowed)",
                                 style = MaterialTheme.typography.bodySmall,
@@ -465,11 +506,18 @@ fun DashboardScreen(
                                 text = "$symbol${totalIOwe.toInt()}",
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
-                                color = BentoRose
+                                color = BentoRose,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
 
-                        Column(horizontalAlignment = Alignment.End) {
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Column(
+                            horizontalAlignment = Alignment.End,
+                            modifier = Modifier.weight(1f)
+                        ) {
                             Text(
                                 text = "Owed To Me (Lent)",
                                 style = MaterialTheme.typography.bodySmall,
@@ -479,7 +527,9 @@ fun DashboardScreen(
                                 text = "$symbol${totalOwedToMe.toInt()}",
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
-                                color = BentoEmerald
+                                color = BentoEmerald,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }
@@ -490,7 +540,9 @@ fun DashboardScreen(
 
             // Bento Dynamic Insight Banner Card
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onNavigateToLedger() },
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = BentoIndigoLight),
                 border = androidx.compose.foundation.BorderStroke(1.dp, BentoIndigoContainer)
@@ -514,7 +566,7 @@ fun DashboardScreen(
                         )
                     }
                     Spacer(modifier = Modifier.width(12.dp))
-                    Column {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = "BUDGET INSIGHT",
                             style = MaterialTheme.typography.labelSmall,
@@ -538,7 +590,8 @@ fun DashboardScreen(
             DoughnutChart(
                 spentAmount = uiState.totalSpentTillToday,
                 remainingAmount = (uiState.initialAmount - uiState.totalSpentTillToday),
-                currencySymbol = symbol
+                currencySymbol = symbol,
+                onChartClick = onNavigateToLedger
             )
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -547,7 +600,8 @@ fun DashboardScreen(
             CategoryBarChart(
                 title = "Spent vs Categories",
                 items = uiState.categorySpendList,
-                currencySymbol = symbol
+                currencySymbol = symbol,
+                onCategoryClick = { _ -> onNavigateToLedger() }
             )
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -555,7 +609,8 @@ fun DashboardScreen(
             CategoryBarChart(
                 title = "Sub-Category Breakdown",
                 items = uiState.subCategorySpendList,
-                currencySymbol = symbol
+                currencySymbol = symbol,
+                onCategoryClick = { _ -> onNavigateToLedger() }
             )
 
             Spacer(modifier = Modifier.height(80.dp))

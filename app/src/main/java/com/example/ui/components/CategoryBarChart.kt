@@ -34,6 +34,9 @@ import com.example.ui.theme.CoralExpense
 import com.example.ui.theme.EmeraldGreen
 import com.example.ui.theme.TealSecondary
 
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.text.style.TextOverflow
+
 data class CategorySpendItem(
     val name: String,
     val amount: Double,
@@ -45,6 +48,7 @@ fun CategoryBarChart(
     title: String,
     items: List<CategorySpendItem>,
     currencySymbol: String,
+    onCategoryClick: ((String) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -87,7 +91,16 @@ fun CategoryBarChart(
                         label = "categoryProgress"
                     )
 
-                    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 6.dp)
+                            .then(
+                                if (onCategoryClick != null) {
+                                    Modifier.clickable { onCategoryClick(item.name) }
+                                } else Modifier
+                            )
+                    ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -97,13 +110,17 @@ fun CategoryBarChart(
                                 text = item.name,
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f).padding(end = 8.dp)
                             )
                             Text(
                                 text = "$currencySymbol${item.amount.toInt()}",
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = item.color
+                                color = item.color,
+                                maxLines = 1
                             )
                         }
 

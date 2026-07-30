@@ -142,7 +142,11 @@ fun MainAppStructure(viewModel: ExpenseViewModel) {
                     onAddExpenseClick = {
                         showAddDialogFromDashboard = true
                         navController.navigate(Screen.Ledger.route)
-                    }
+                    },
+                    onNavigateToLedger = { navController.navigate(Screen.Ledger.route) },
+                    onNavigateToLoans = { navController.navigate(Screen.Loans.route) },
+                    onNavigateToSavings = { navController.navigate(Screen.Savings.route) },
+                    onNavigateToSettings = { navController.navigate(Screen.Settings.route) }
                 )
             }
 
