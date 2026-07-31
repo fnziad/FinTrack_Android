@@ -279,8 +279,7 @@ fun DashboardScreen(
                             Text(
                                 text = "${uiState.daysUntilSalary}",
                                 style = MaterialTheme.typography.headlineLarge,
-                                fontWeight = FontWeight.Black,
-                                fontStyle = FontStyle.Italic,
+                                fontWeight = FontWeight.ExtraBold,
                                 color = Color.White,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
@@ -407,7 +406,7 @@ fun DashboardScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Bento Grid Block 2: Daily Spend vs Month Total Card + Averages
             Row(
@@ -426,34 +425,15 @@ fun DashboardScreen(
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Row(
+                        Text(
+                            text = "SPENT TODAY",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "SPENT TODAY",
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.weight(1f),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(if (uiState.spentToday > 0) Color(0xFFFFE4E6) else Color(0xFFD1FAE5))
-                                    .padding(horizontal = 6.dp, vertical = 2.dp)
-                            ) {
-                                Text(
-                                    text = if (uiState.spentToday > 0) "Today" else "Saved",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (uiState.spentToday > 0) BentoRose else BentoEmerald
-                                )
-                            }
-                        }
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
 
                         Spacer(modifier = Modifier.height(6.dp))
 
@@ -476,8 +456,8 @@ fun DashboardScreen(
                         Text(
                             text = "$symbol${uiState.totalSpentTillToday.toInt()}",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = BentoRose,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -526,8 +506,8 @@ fun DashboardScreen(
                         Text(
                             text = "$symbol${uiState.targetAvg.toInt()}",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = BentoEmerald,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -535,7 +515,7 @@ fun DashboardScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // DAILY SPEND PACE & TARGET BUDGET TRACKER
             Card(
@@ -663,19 +643,11 @@ fun DashboardScreen(
                                 trackColor = BentoEmeraldLight
                             )
                         }
-                        Spacer(modifier = Modifier.height(10.dp))
                     }
-
-                    Text(
-                        text = uiState.runRateAdvice,
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // TOP COST DRIVERS & SPENDING ANALYTICS
             if (uiState.topCostDriverAmount > 0) {
@@ -765,18 +737,10 @@ fun DashboardScreen(
                                 }
                             }
                         }
-
-                        Spacer(modifier = Modifier.height(10.dp))
-
-                        Text(
-                            text = uiState.costDriverSuggestion,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
             // RECURRING INFLOW & INCOME STREAMS CARD
@@ -1198,7 +1162,7 @@ fun DashboardScreen(
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(bottom = 16.dp, end = 16.dp)
+                .padding(bottom = 28.dp, end = 20.dp)
                 .testTag("fab_add_transaction")
         ) {
             Icon(Icons.Default.Add, contentDescription = "Add Transaction")

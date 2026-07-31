@@ -50,7 +50,7 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
     object Dashboard : Screen("dashboard", "Dashboard", Icons.Default.Dashboard)
     object Ledger : Screen("ledger", "Ledger", Icons.Default.Receipt)
     object Savings : Screen("savings", "Savings", Icons.Default.Savings)
-    object Loans : Screen("loans", "Loans & Debt", Icons.Default.AccountBalance)
+    object Loans : Screen("loans", "Loans", Icons.Default.AccountBalance)
     object Settings : Screen("settings", "Settings", Icons.Default.Settings)
 }
 
@@ -105,7 +105,7 @@ fun MainAppStructure(viewModel: ExpenseViewModel) {
                                         saveState = true
                                     }
                                     launchSingleTop = true
-                                    restoreState = true
+                                    restoreState = screen.route != Screen.Dashboard.route
                                 }
                             }
                         },
