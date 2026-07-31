@@ -1,7 +1,9 @@
 package com.example.shared.data.database
 
+import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.RoomDatabaseConstructor
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.example.shared.data.dao.LoanDao
 import com.example.shared.data.dao.SavingsGoalDao
@@ -26,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
     version = 4,
     exportSchema = false
 )
+@ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun transactionDao(): TransactionDao
     abstract fun savingsGoalDao(): SavingsGoalDao
@@ -34,6 +37,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
 }
 
+@Suppress("NO_ACTUAL_FOR_EXPECT")
+expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase>
+
 /**
  * Platform-neutral builder helper. Each platform provides the builder
  * via an expect/actual pair in DatabaseFactory.kt.
@@ -41,7 +47,7 @@ abstract class AppDatabase : RoomDatabase() {
 fun buildAppDatabase(builder: RoomDatabase.Builder<AppDatabase>): AppDatabase {
     return builder
         .setDriver(BundledSQLiteDriver())
-        .setQueryCoroutineContext(Dispatchers.IO)
+        .setQueryCoroutineContext(Dispatchers.Default)
         .fallbackToDestructiveMigration(dropAllTables = true)
         .build()
 }

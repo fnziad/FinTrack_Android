@@ -12,6 +12,7 @@ import com.example.shared.data.model.TransactionEntity
 import com.example.shared.data.model.UserSettingsEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.datetime.Clock
 
 class ExpenseRepository(
     private val transactionDao: TransactionDao,
@@ -92,7 +93,7 @@ class ExpenseRepository(
     }
 
     suspend fun restoreSampleData(preset: String = "DEMO") {
-        val now = System.currentTimeMillis()
+        val now = Clock.System.now().toEpochMilliseconds()
         val dayMs = 24L * 3600 * 1000
 
         val settings = UserSettingsEntity(

@@ -6,6 +6,11 @@ plugins {
   alias(libs.plugins.compose.multiplatform)
   alias(libs.plugins.kotlin.compose)
   alias(libs.plugins.google.devtools.ksp)
+  alias(libs.plugins.androidx.room)
+}
+
+room {
+  schemaDirectory("$projectDir/schemas")
 }
 
 kotlin {
@@ -22,7 +27,7 @@ kotlin {
   ).forEach { iosTarget ->
     iosTarget.binaries.framework {
       baseName = "shared"
-      isStatic = true
+      isStatic = false
     }
   }
 
@@ -39,7 +44,6 @@ kotlin {
       // Room KMP (2.7+ has official multiplatform support)
       implementation(libs.androidx.room.runtime)
       implementation(libs.sqlite.bundled)
-      implementation(libs.androidx.room.ktx)
 
       // Coroutines
       implementation(libs.kotlinx.coroutines.core)
@@ -72,10 +76,10 @@ kotlin {
   }
 }
 
-// KSP for Room on all KMP targets
 dependencies {
-  add("kspAndroid", libs.androidx.room.compiler)
+  add("kspCommonMainMetadata", libs.androidx.room.compiler)
   add("kspIosSimulatorArm64", libs.androidx.room.compiler)
-  add("kspIosArm64", libs.androidx.room.compiler)
-  add("kspIosX64", libs.androidx.room.compiler)
+  add("kspAndroid", libs.androidx.room.compiler)
 }
+
+
