@@ -4,6 +4,18 @@
 
 ---
 
+## 📸 Screenshots
+
+| Dashboard | Ledger | Savings |
+|:-:|:-:|:-:|
+| ![Dashboard](docs/screenshots/dashboard.png) | ![Ledger](docs/screenshots/ledger.png) | ![Savings](docs/screenshots/savings.png) |
+
+| Loans & Debts | Settings |
+|:-:|:-:|
+| ![Loans](docs/screenshots/loans.png) | ![Settings](docs/screenshots/settings.png) |
+
+---
+
 ## ✨ Features
 
 - 📊 **Smart Dashboard**:
@@ -12,7 +24,7 @@
   - **Cost Driver Analytics**: Identifies your highest spending category and single largest expense.
   - **Category Breakdown**: Interactive visual analytics of sub-category expenditures.
 - 📜 **Ledger**: Track income and expense transactions with quick category filtering and transaction history.
-- 🎯 **Savings Goals**: Set custom monthly savings goals, track progress bars, and view projected end-of-month savings.
+- 🎯 **Savings Goals**: Set custom savings wallets, track progress bars, and view accumulated vs. target amounts.
 - 🤝 **Loans & Debt Management**: Keep tabs on money owed to you and debt repayments with settlement tracking.
 - 🎨 **Custom Theme Presets**: Switch between light and dark modes with curated color palettes (Indigo, Emerald, Ocean, Teal, Rose).
 - 🔤 **Space Grotesk Typography**: Geometric, tech-forward editorial typography system.
@@ -70,3 +82,13 @@ The project includes an automated **GitHub Actions** workflow (`.github/workflow
 - Configures JDK 21 (Temurin distribution) and Gradle wrapper.
 - Auto-generates debug keystores if missing.
 - Builds the Debug APK and uploads the artifact for every push or PR to `main`.
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] **iOS Support** — Kotlin Multiplatform (KMP) + Compose Multiplatform migration (`feature/ios-kmp` branch in progress).
+- [ ] Push notifications for payday reminders.
+- [ ] Cloud sync and backup via Firebase.
+- [ ] Recurring transaction automation.
+- [ ] Export to CSV / PDF reports.
