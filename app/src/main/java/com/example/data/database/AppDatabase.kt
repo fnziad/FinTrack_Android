@@ -6,10 +6,12 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.data.dao.LoanDao
 import com.example.data.dao.SavingsGoalDao
+import com.example.data.dao.TaskDao
 import com.example.data.dao.TransactionDao
 import com.example.data.dao.UserSettingsDao
 import com.example.data.model.LoanEntity
 import com.example.data.model.SavingsGoalEntity
+import com.example.data.model.TaskEntity
 import com.example.data.model.TransactionEntity
 import com.example.data.model.UserSettingsEntity
 
@@ -18,9 +20,10 @@ import com.example.data.model.UserSettingsEntity
         TransactionEntity::class,
         SavingsGoalEntity::class,
         LoanEntity::class,
-        UserSettingsEntity::class
+        UserSettingsEntity::class,
+        TaskEntity::class
     ],
-    version = 1,
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -28,6 +31,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun savingsGoalDao(): SavingsGoalDao
     abstract fun loanDao(): LoanDao
     abstract fun userSettingsDao(): UserSettingsDao
+    abstract fun taskDao(): TaskDao
 
     companion object {
         @Volatile

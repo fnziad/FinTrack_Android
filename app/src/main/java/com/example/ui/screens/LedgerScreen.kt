@@ -57,6 +57,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.data.model.TransactionEntity
 import com.example.ui.theme.CoralExpense
 import com.example.ui.theme.EmeraldGreen
@@ -230,8 +231,16 @@ fun LedgerScreen(
                 showAddModal = false
                 onDialogDismissed()
             },
-            onConfirm = { type, amount, category, subCategory, description ->
-                viewModel.addTransaction(type, amount, category, subCategory, description)
+            onConfirm = { type, amount, category, subCategory, description, isRecurring, frequency ->
+                viewModel.addTransaction(
+                    type = type,
+                    amount = amount,
+                    category = category,
+                    subCategory = subCategory,
+                    description = description,
+                    isRecurring = isRecurring,
+                    recurringFrequency = frequency
+                )
                 showAddModal = false
                 onDialogDismissed()
             }
@@ -298,11 +307,32 @@ fun TransactionItemCard(
                         maxLines = 1,
                         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                     )
-                    Text(
-                        text = dateStr,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.outline
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = dateStr,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+                        if (transaction.isRecurring) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(MaterialTheme.colorScheme.primaryContainer)
+                                    .padding(horizontal = 4.dp, vertical = 1.dp)
+                            ) {
+                                Text(
+                                    text = "🔁 ${transaction.recurringFrequency}",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
+                        }
+                    }
                 }
             }
 
@@ -334,13 +364,15 @@ fun TransactionItemCard(
 fun AddTransactionDialog(
     currencySymbol: String,
     onDismiss: () -> Unit,
-    onConfirm: (type: String, amount: Double, category: String, subCategory: String, description: String) -> Unit
+    onConfirm: (type: String, amount: Double, category: String, subCategory: String, description: String, isRecurring: Boolean, frequency: String) -> Unit
 ) {
     var type by remember { mutableStateOf("EXPENSE") }
     var amountText by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("Food & Mess") }
     var subCategory by remember { mutableStateOf("Rickshaw Fare") }
     var description by remember { mutableStateOf("") }
+    var isRecurring by remember { mutableStateOf(false) }
+    var recurringFrequency by remember { mutableStateOf("Monthly") }
 
     val categories = listOf(
         "Food & Mess",
@@ -349,6 +381,8 @@ fun AddTransactionDialog(
         "Utilities & Mobile",
         "Shopping & Personal",
         "Salary & Income",
+        "Pocket Money & Stipend",
+        "Business & Side Hustle",
         "Loans & Debt",
         "Miscellaneous"
     )
@@ -360,6 +394,8 @@ fun AddTransactionDialog(
         "Utilities & Mobile" to listOf("Mobile Recharge", "Bkash/Nagad Cashout Fee", "Wifi Bill", "Electricity/Gas Share"),
         "Shopping & Personal" to listOf("Clothes & Shoes", "Groceries", "Medicine", "Barber/Salon"),
         "Salary & Income" to listOf("Monthly Salary", "Tuition Income", "Freelance", "Pocket Money"),
+        "Pocket Money & Stipend" to listOf("Daily Allowance", "Weekly Pocket Money", "Parents Stipend"),
+        "Business & Side Hustle" to listOf("Daily Shop Revenue", "Online Store Sales", "Client Project"),
         "Loans & Debt" to listOf("Borrowed Repayment", "Lent Money", "Mess Loan"),
         "Miscellaneous" to listOf("General", "Gift", "Entertainment")
     )
@@ -466,6 +502,44 @@ fun AddTransactionDialog(
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
+
+                // Recurring Income / Expense Toggle
+                Column {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { isRecurring = !isRecurring },
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = if (type == "INCOME") "Recurring Income? (e.g. Daily sales, Weekly pocket money)" else "Recurring Expense?",
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        androidx.compose.material3.Switch(
+                            checked = isRecurring,
+                            onCheckedChange = { isRecurring = it }
+                        )
+                    }
+
+                    if (isRecurring) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text("Recurring Frequency:", style = MaterialTheme.typography.labelSmall)
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            listOf("Daily", "Weekly", "Monthly").forEach { freq ->
+                                FilterChip(
+                                    selected = recurringFrequency == freq,
+                                    onClick = { recurringFrequency = freq },
+                                    label = { Text(freq, fontSize = 11.sp) }
+                                )
+                            }
+                        }
+                    }
+                }
             }
         },
         confirmButton = {
@@ -473,7 +547,7 @@ fun AddTransactionDialog(
                 onClick = {
                     val amount = amountText.toDoubleOrNull() ?: 0.0
                     if (amount > 0) {
-                        onConfirm(type, amount, category, subCategory, description)
+                        onConfirm(type, amount, category, subCategory, description, isRecurring, if (isRecurring) recurringFrequency else "One-time")
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = EmeraldGreen)

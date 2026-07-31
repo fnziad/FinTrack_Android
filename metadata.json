@@ -1,6 +1,6 @@
 {
-  "name": "FinTrack",
-  "description": "Smart Expense & Budget Tracker with Bento Grid UI tailored for Freshers, Students, and Job Holders.",
+  "name": "TakaKoi",
+  "description": "Smart Expense & Budget Tracker with Daily Spend Pace Tracking, Recurring Income, and Cost Driver Analytics.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

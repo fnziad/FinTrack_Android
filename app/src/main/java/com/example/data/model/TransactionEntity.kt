@@ -12,5 +12,7 @@ data class TransactionEntity(
     val subCategory: String,
     val description: String,
     val dateEpochMillis: Long = System.currentTimeMillis(),
-    val dayName: String = ""
+    val dayName: String = "",
+    val isRecurring: Boolean = false,
+    val recurringFrequency: String = "One-time" // "Daily", "Weekly", "Monthly", "One-time"
 )

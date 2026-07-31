@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -41,7 +43,6 @@ import com.example.ui.screens.SavingsScreen
 import com.example.ui.screens.SettingsScreen
 import com.example.ui.theme.BentoIndigoContainer
 import com.example.ui.theme.BentoIndigoPrimary
-import com.example.ui.theme.EmeraldGreen
 import com.example.ui.theme.TakaTrackTheme
 import com.example.ui.viewmodel.ExpenseViewModel
 
@@ -62,7 +63,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val userSettings by viewModel.userSettings.collectAsState()
-            val isDark = userSettings?.isDarkMode ?: androidx.compose.foundation.isSystemInDarkTheme()
+            val isDark = userSettings?.isDarkMode ?: isSystemInDarkTheme()
 
             TakaTrackTheme(darkTheme = isDark) {
                 MainAppStructure(viewModel = viewModel)
@@ -90,22 +91,14 @@ fun MainAppStructure(viewModel: ExpenseViewModel) {
     Scaffold(
         bottomBar = {
             NavigationBar(
-                containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surface
+                containerColor = MaterialTheme.colorScheme.surface
             ) {
                 items.forEach { screen ->
                     val selected = currentRoute == screen.route
                     NavigationBarItem(
                         selected = selected,
                         onClick = {
-                            if (screen.route == Screen.Dashboard.route) {
-                                val popped = navController.popBackStack(Screen.Dashboard.route, inclusive = false)
-                                if (!popped && currentRoute != Screen.Dashboard.route) {
-                                    navController.navigate(Screen.Dashboard.route) {
-                                        popUpTo(navController.graph.findStartDestination().id)
-                                        launchSingleTop = true
-                                    }
-                                }
-                            } else if (currentRoute != screen.route) {
+                            if (currentRoute != screen.route) {
                                 navController.navigate(screen.route) {
                                     popUpTo(navController.graph.findStartDestination().id) {
                                         saveState = true
