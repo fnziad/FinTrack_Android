@@ -3,23 +3,23 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Wallet body centered inside 66dp safe area (21..87) -->
-    <path
-        android:fillColor="#10B981"
-        android:pathData="M26,38 C26,34.7 28.7,32 32,32 L76,32 C79.3,32 82,34.7 82,38 L82,70 C82,73.3 79.3,76 76,76 L32,76 C28.7,76 26,73.3 26,70 Z" />
-    <path
-        android:fillColor="#34D399"
-        android:pathData="M26,44 L82,44 L82,70 C82,73.3 79.3,76 76,76 L32,76 C28.7,76 26,73.3 26,70 Z" />
-    <!-- Wallet Flap -->
-    <path
-        android:fillColor="#059669"
-        android:pathData="M66,48 C66,45.8 67.8,44 70,44 L82,44 L82,64 L70,64 C67.8,64 66,62.2 66,60 Z" />
-    <!-- Wallet Snap/Coin -->
-    <path
-        android:fillColor="#F59E0B"
-        android:pathData="M73,54 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
-    <!-- Cash note popping out -->
+    <!-- Cash note popping out top -->
     <path
         android:fillColor="#A7F3D0"
         android:pathData="M34,26 C34,24.9 34.9,24 36,24 L72,24 C73.1,24 74,24.9 74,26 L74,34 L34,34 Z" />
+    <!-- Wallet main body -->
+    <path
+        android:fillColor="#6366F1"
+        android:pathData="M26,38 C26,34.7 28.7,32 32,32 L76,32 C79.3,32 82,34.7 82,38 L82,70 C82,73.3 79.3,76 76,76 L32,76 C28.7,76 26,73.3 26,70 Z" />
+    <path
+        android:fillColor="#4F46E5"
+        android:pathData="M26,44 L82,44 L82,70 C82,73.3 79.3,76 76,76 L32,76 C28.7,76 26,73.3 26,70 Z" />
+    <!-- Wallet Flap -->
+    <path
+        android:fillColor="#10B981"
+        android:pathData="M64,48 C64,45.8 65.8,44 68,44 L82,44 L82,64 L68,64 C65.8,64 64,62.2 64,60 Z" />
+    <!-- Gold Coin Snap -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M73,54 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
 </vector>

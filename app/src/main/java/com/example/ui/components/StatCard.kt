@@ -28,7 +28,7 @@ fun StatCard(
     title: String,
     value: String,
     containerColor: Color = MaterialTheme.colorScheme.surface,
-    borderColor: Color = BentoCardBorder,
+    borderColor: Color = MaterialTheme.colorScheme.outlineVariant,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
     subText: String? = null,
     modifier: Modifier = Modifier

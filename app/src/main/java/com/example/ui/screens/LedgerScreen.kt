@@ -205,7 +205,7 @@ fun LedgerScreen(
                         )
                     }
                     item {
-                        Spacer(modifier = Modifier.height(70.dp))
+                        Spacer(modifier = Modifier.height(120.dp))
                     }
                 }
             }
@@ -213,11 +213,11 @@ fun LedgerScreen(
 
         FloatingActionButton(
             onClick = { showAddModal = true },
-            containerColor = EmeraldGreen,
-            contentColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(20.dp)
+                .padding(bottom = 16.dp, end = 16.dp)
                 .testTag("ledger_fab_add")
         ) {
             Icon(Icons.Default.Add, contentDescription = "Add Item")

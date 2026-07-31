@@ -193,16 +193,16 @@ fun DashboardScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 12.dp)
-                        .border(1.dp, BentoIndigoContainer, RoundedCornerShape(20.dp)),
+                        .border(1.dp, MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(20.dp)),
                     shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = BentoIndigoLight)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f))
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = "🚀 Get Started with FinTrack",
+                            text = "🚀 Get Started with TakaTrack",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = BentoIndigoPrimary
+                            color = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
@@ -219,26 +219,26 @@ fun DashboardScreen(
                             Button(
                                 onClick = { showProfileSetupDialog = true },
                                 modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.buttonColors(containerColor = BentoIndigoPrimary),
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                                 shape = RoundedCornerShape(12.dp)
                             ) {
-                                Text("Set Up Profile", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                Text("Set Up Profile", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = MaterialTheme.colorScheme.onPrimary)
                             }
 
                             OutlinedButton(
                                 onClick = { viewModel.loadDemoData() },
                                 modifier = Modifier.weight(1f).testTag("btn_load_sample_demo"),
                                 shape = RoundedCornerShape(12.dp),
-                                border = androidx.compose.foundation.BorderStroke(1.dp, BentoIndigoPrimary)
+                                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Refresh,
                                     contentDescription = null,
-                                    tint = BentoIndigoPrimary,
+                                    tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(14.dp)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text("Load Sample Data", fontWeight = FontWeight.Bold, color = BentoIndigoPrimary, fontSize = 12.sp)
+                                Text("Load Sample Data", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
                             }
                         }
                     }
@@ -541,11 +541,11 @@ fun DashboardScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(1.dp, BentoIndigoContainer, RoundedCornerShape(24.dp))
+                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(24.dp))
                     .testTag("stat_run_rate_card"),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
                 Column(modifier = Modifier.padding(18.dp)) {
                     Row(
@@ -553,20 +553,21 @@ fun DashboardScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = "🎯 DAILY SPEND PACE TRACKER",
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = BentoIndigoPrimary,
-                                letterSpacing = 0.5.sp
-                            )
-                        }
+                        Text(
+                            text = "🎯 DAILY SPEND PACE TRACKER",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            letterSpacing = 0.5.sp,
+                            modifier = Modifier.weight(1f, fill = false)
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
 
                         val statusBadgeBg = when (uiState.runRateStatus) {
-                            "ON_TRACK" -> BentoEmeraldLight
-                            "WARNING" -> BentoAmberLight
-                            else -> BentoRose.copy(alpha = 0.2f)
+                            "ON_TRACK" -> BentoEmerald.copy(alpha = 0.15f)
+                            "WARNING" -> BentoAmber.copy(alpha = 0.15f)
+                            else -> BentoRose.copy(alpha = 0.15f)
                         }
                         val statusBadgeTxt = when (uiState.runRateStatus) {
                             "ON_TRACK" -> BentoEmerald
@@ -574,14 +575,14 @@ fun DashboardScreen(
                             else -> BentoRose
                         }
                         val statusText = when (uiState.runRateStatus) {
-                            "ON_TRACK" -> "ON TRACK 🎯"
-                            "WARNING" -> "CAUTION ⚠️"
-                            else -> "HIGH PACE 🚨"
+                            "ON_TRACK" -> "ON TRACK"
+                            "WARNING" -> "CAUTION"
+                            else -> "HIGH PACE"
                         }
 
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(10.dp))
+                                .clip(RoundedCornerShape(8.dp))
                                 .background(statusBadgeBg)
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                         ) {
@@ -611,7 +612,7 @@ fun DashboardScreen(
                                 text = "$symbol${uiState.currentRunRate.toInt()}/day",
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.ExtraBold,
-                                color = if (uiState.runRateStatus == "OVER_BUDGET") BentoRose else BentoIndigoPrimary
+                                color = if (uiState.runRateStatus == "OVER_BUDGET") BentoRose else MaterialTheme.colorScheme.primary
                             )
                         }
 
@@ -782,7 +783,7 @@ fun DashboardScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(1.dp, BentoEmeraldLight, RoundedCornerShape(24.dp))
+                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(24.dp))
                     .testTag("stat_recurring_income_card"),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -795,18 +796,27 @@ fun DashboardScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "💵 MONTHLY INFLOW & RECURRING STREAMS",
+                            text = "💵 RECURRING MONTHLY INFLOW",
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold,
                             color = BentoEmerald,
-                            letterSpacing = 0.5.sp
+                            letterSpacing = 0.5.sp,
+                            modifier = Modifier.weight(1f, fill = false)
                         )
-                        Text(
-                            text = "Est. Inflow: $symbol${uiState.totalProjectedMonthlyInflow.toInt()}",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = BentoEmerald
-                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(BentoEmerald.copy(alpha = 0.15f))
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = "Est: $symbol${uiState.totalProjectedMonthlyInflow.toInt()}",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = BentoEmerald
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -1177,18 +1187,18 @@ fun DashboardScreen(
                 onCategoryClick = { _ -> onNavigateToLedger() }
             )
 
-            Spacer(modifier = Modifier.height(80.dp))
+            Spacer(modifier = Modifier.height(120.dp))
         }
 
         // Floating Action Button
         FloatingActionButton(
             onClick = onAddExpenseClick,
-            containerColor = BentoIndigoPrimary,
-            contentColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(20.dp)
+                .padding(bottom = 16.dp, end = 16.dp)
                 .testTag("fab_add_transaction")
         ) {
             Icon(Icons.Default.Add, contentDescription = "Add Transaction")

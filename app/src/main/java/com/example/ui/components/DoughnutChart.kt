@@ -62,7 +62,7 @@ fun DoughnutChart(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .border(1.dp, BentoCardBorder, RoundedCornerShape(24.dp))
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(24.dp))
             .then(
                 if (onChartClick != null) Modifier.clickable { onChartClick() } else Modifier
             ),

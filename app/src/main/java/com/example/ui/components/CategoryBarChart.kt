@@ -54,7 +54,7 @@ fun CategoryBarChart(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .border(1.dp, BentoCardBorder, RoundedCornerShape(24.dp)),
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(24.dp)),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
