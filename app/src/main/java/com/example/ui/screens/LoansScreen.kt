@@ -107,7 +107,7 @@ fun LoansScreen(
                 Card(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFEE2E2))
+                    colors = CardDefaults.cardColors(containerColor = CoralExpense.copy(alpha = 0.15f))
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
                         Text(
@@ -132,7 +132,7 @@ fun LoansScreen(
                 Card(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFD1FAE5))
+                    colors = CardDefaults.cardColors(containerColor = EmeraldGreen.copy(alpha = 0.15f))
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
                         Text(
@@ -306,7 +306,7 @@ fun LoanCardItem(
                     Box(
                         modifier = Modifier
                             .clip(CircleShape)
-                            .background(if (isBorrow) Color(0xFFFEE2E2) else Color(0xFFD1FAE5))
+                            .background(if (isBorrow) CoralExpense.copy(alpha = 0.15f) else EmeraldGreen.copy(alpha = 0.15f))
                             .padding(8.dp)
                     ) {
                         Text(

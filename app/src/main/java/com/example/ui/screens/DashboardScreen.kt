@@ -566,7 +566,7 @@ fun DashboardScreen(
                         val statusBadgeBg = when (uiState.runRateStatus) {
                             "ON_TRACK" -> BentoEmeraldLight
                             "WARNING" -> BentoAmberLight
-                            else -> Color(0xFFFFE4E6)
+                            else -> BentoRose.copy(alpha = 0.2f)
                         }
                         val statusBadgeTxt = when (uiState.runRateStatus) {
                             "ON_TRACK" -> BentoEmerald
@@ -717,7 +717,7 @@ fun DashboardScreen(
                             Card(
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(16.dp),
-                                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF1F2))
+                                colors = CardDefaults.cardColors(containerColor = BentoRose.copy(alpha = 0.12f))
                             ) {
                                 Column(modifier = Modifier.padding(12.dp)) {
                                     Text("Biggest Category", style = MaterialTheme.typography.labelSmall, color = BentoRose)
@@ -831,7 +831,7 @@ fun DashboardScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clip(RoundedCornerShape(12.dp))
-                                        .background(Color(0xFFF0FDF4))
+                                        .background(BentoEmerald.copy(alpha = 0.12f))
                                         .padding(horizontal = 12.dp, vertical = 8.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically

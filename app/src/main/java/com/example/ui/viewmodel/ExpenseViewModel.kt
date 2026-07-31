@@ -491,6 +491,7 @@ class ExpenseViewModel(application: Application) : AndroidViewModel(application)
         targetSavings: Double = 0.0,
         targetBudget: Double = 0.0,
         incomeFrequency: String = "Monthly",
+        colorTheme: String? = null,
         isDarkMode: Boolean? = null
     ) {
         viewModelScope.launch {
@@ -503,8 +504,17 @@ class ExpenseViewModel(application: Application) : AndroidViewModel(application)
                 targetSavings = targetSavings,
                 targetBudget = targetBudget,
                 incomeFrequency = incomeFrequency,
+                colorTheme = colorTheme ?: current.colorTheme,
                 isDarkMode = isDarkMode ?: current.isDarkMode
             )
+            repository.saveUserSettings(updated)
+        }
+    }
+
+    fun updateColorTheme(colorTheme: String) {
+        viewModelScope.launch {
+            val current = repository.userSettings.firstOrNull() ?: UserSettingsEntity()
+            val updated = current.copy(colorTheme = colorTheme)
             repository.saveUserSettings(updated)
         }
     }

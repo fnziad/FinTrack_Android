@@ -14,6 +14,7 @@ data class UserSettingsEntity(
     val targetSavings: Double = 0.0,
     val targetBudget: Double = 0.0,
     val incomeFrequency: String = "Monthly", // "Daily", "Weekly", "Monthly", "Custom/Irregular"
+    val colorTheme: String = "INDIGO", // "INDIGO", "EMERALD", "OCEAN", "TEAL", "ROSE"
     val isDarkMode: Boolean = false,
     val isDataLoaded: Boolean = false
 )

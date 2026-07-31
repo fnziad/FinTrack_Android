@@ -64,8 +64,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             val userSettings by viewModel.userSettings.collectAsState()
             val isDark = userSettings?.isDarkMode ?: isSystemInDarkTheme()
+            val themePreset = userSettings?.colorTheme ?: "INDIGO"
 
-            TakaTrackTheme(darkTheme = isDark) {
+            TakaTrackTheme(darkTheme = isDark, colorTheme = themePreset) {
                 MainAppStructure(viewModel = viewModel)
             }
         }
@@ -121,9 +122,11 @@ fun MainAppStructure(viewModel: ExpenseViewModel) {
                             )
                         },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = BentoIndigoPrimary,
-                            selectedTextColor = BentoIndigoPrimary,
-                            indicatorColor = BentoIndigoContainer
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                            indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                         ),
                         modifier = Modifier.testTag("nav_item_${screen.route}")
                     )

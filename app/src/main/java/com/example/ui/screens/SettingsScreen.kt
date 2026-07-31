@@ -1,7 +1,10 @@
 package com.example.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,7 +12,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -19,6 +24,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material3.AlertDialog
@@ -43,10 +49,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.ui.theme.BentoCardBorder
 import com.example.ui.theme.BentoIndigoPrimary
 import com.example.ui.theme.CoralExpense
@@ -66,9 +74,18 @@ fun SettingsScreen(
     var salaryDayText by remember(userSettings?.salaryDay) { mutableStateOf((userSettings?.salaryDay ?: 1).toString()) }
     var selectedCurrency by remember(userSettings?.currencySymbol) { mutableStateOf(userSettings?.currencySymbol ?: "৳") }
     val isDarkMode = userSettings?.isDarkMode ?: false
+    val selectedTheme = userSettings?.colorTheme ?: "INDIGO"
 
     var showResetDialog by remember { mutableStateOf(false) }
     var showClearDialog by remember { mutableStateOf(false) }
+
+    val themePresets = listOf(
+        Triple("INDIGO", "Indigo", Color(0xFF4F46E5)),
+        Triple("EMERALD", "Emerald", Color(0xFF059669)),
+        Triple("OCEAN", "Ocean", Color(0xFF2563EB)),
+        Triple("TEAL", "Teal", Color(0xFF0D9488)),
+        Triple("ROSE", "Rose", Color(0xFFE11D48))
+    )
 
     Column(
         modifier = modifier
@@ -83,60 +100,118 @@ fun SettingsScreen(
             color = MaterialTheme.colorScheme.onSurface
         )
         Text(
-            text = "Configure your profile, theme mode, currency & starting budget",
+            text = "Configure your profile, theme mode, color presets & currency",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Appearance & Dark Mode Card
+        // Appearance & Theme Options Card
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(1.dp, BentoCardBorder, RoundedCornerShape(20.dp)),
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp)),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = if (isDarkMode) Icons.Default.DarkMode else Icons.Default.LightMode,
-                        contentDescription = null,
-                        tint = BentoIndigoPrimary,
-                        modifier = Modifier.padding(end = 12.dp)
-                    )
-                    Column {
-                        Text(
-                            text = if (isDarkMode) "Dark Theme" else "Light Theme",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = if (isDarkMode) Icons.Default.DarkMode else Icons.Default.LightMode,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(end = 12.dp)
                         )
-                        Text(
-                            text = "Toggle display theme mode",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Column {
+                            Text(
+                                text = if (isDarkMode) "Dark Theme Mode" else "Light Theme Mode",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = "Minimal OLED aesthetic in dark mode",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
+
+                    Switch(
+                        checked = isDarkMode,
+                        onCheckedChange = { viewModel.toggleDarkMode(it) },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = MaterialTheme.colorScheme.primary
+                        ),
+                        modifier = Modifier.testTag("switch_dark_mode")
+                    )
                 }
 
-                Switch(
-                    checked = isDarkMode,
-                    onCheckedChange = { viewModel.toggleDarkMode(it) },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color.White,
-                        checkedTrackColor = BentoIndigoPrimary
-                    ),
-                    modifier = Modifier.testTag("switch_dark_mode")
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "Light Theme Color Palette Preset",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
+                Text(
+                    text = "Select primary theme color for light mode display",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    themePresets.forEach { (code, label, swatchColor) ->
+                        val isSelected = selectedTheme.equals(code, ignoreCase = true)
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(
+                                    if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+                                )
+                                .border(
+                                    width = if (isSelected) 2.dp else 0.dp,
+                                    color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .clickable { viewModel.updateColorTheme(code) }
+                                .padding(vertical = 10.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(18.dp)
+                                        .clip(CircleShape)
+                                        .background(swatchColor)
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = label,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontSize = 11.sp,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                    color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -275,10 +350,10 @@ fun SettingsScreen(
                         viewModel.updateUserSettings(userName, initCash, salDay, selectedCurrency)
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = BentoIndigoPrimary),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text("Save Settings", fontWeight = FontWeight.Bold)
+                    Text("Save Settings", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimary)
                 }
             }
         }
@@ -289,7 +364,7 @@ fun SettingsScreen(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(1.dp, BentoCardBorder, RoundedCornerShape(20.dp)),
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp)),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
@@ -299,7 +374,7 @@ fun SettingsScreen(
                     Icon(
                         imageVector = Icons.Default.Storage,
                         contentDescription = null,
-                        tint = BentoIndigoPrimary,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(end = 8.dp)
                     )
                     Text(
@@ -321,7 +396,7 @@ fun SettingsScreen(
                         modifier = Modifier
                             .weight(1f)
                             .testTag("btn_clear_data"),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFEE2E2)),
+                        colors = ButtonDefaults.buttonColors(containerColor = CoralExpense.copy(alpha = 0.15f)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Icon(
@@ -344,10 +419,10 @@ fun SettingsScreen(
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = null,
-                            tint = BentoIndigoPrimary,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = Modifier.padding(end = 4.dp)
                         )
-                        Text("Load Sample Data", fontWeight = FontWeight.Bold, color = BentoIndigoPrimary)
+                        Text("Load Sample Data", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
                     }
                 }
 
