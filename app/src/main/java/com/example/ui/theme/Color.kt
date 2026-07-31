@@ -2,41 +2,62 @@ package com.example.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Bento Grid Design Theme Palette
-val BentoIndigoPrimary = Color(0xFF4F46E5)      // Indigo-600
-val BentoIndigoDark = Color(0xFF312E81)         // Indigo-900
-val BentoIndigoLight = Color(0xFFEEF2FF)        // Indigo-50
-val BentoIndigoContainer = Color(0xFFE0E7FF)    // Indigo-100
+// ── Premium Neutral Base ──────────────────────────────────────────────────────
+val PremiumBlack      = Color(0xFF0A0A0F)   // Near-black for dark accents
+val PremiumInk        = Color(0xFF111118)   // Deep ink card
+val PremiumCharcoal   = Color(0xFF1A1A27)   // Slightly lighter dark surface
+val PremiumSlate      = Color(0xFF6B7280)   // Muted label text
 
-val BentoSlateBg = Color(0xFFF7F9FC)           // Soft background
-val BentoSlateCard = Color(0xFFFFFFFF)         // White card surface
-val BentoDarkCard = Color(0xFF0F172A)          // Slate-900 for dark summary cards
-val BentoCardBorder = Color(0xFFE2E8F0)        // Slate-200 border
+val PremiumBg         = Color(0xFFF5F4F2)   // Warm off-white background
+val PremiumSurface    = Color(0xFFFFFFFF)   // Pure white card
+val PremiumBorder     = Color(0xFFEAE9E6)   // Very subtle warm border
 
-val BentoEmerald = Color(0xFF10B981)           // Emerald-500
-val BentoEmeraldLight = Color(0xFFECFDF5)      // Emerald-50
-val BentoAmber = Color(0xFFF59E0B)             // Amber-500
-val BentoAmberLight = Color(0xFFFFFBEB)        // Amber-50
-val BentoRose = Color(0xFFF43F5E)              // Rose-500
-val BentoRoseLight = Color(0xFFFF1F2)          // Rose-50
+// ── Primary Accent ─────────────────────────────────────────────────────────
+val PremiumViolet     = Color(0xFF6C52EF)   // Bold violet-indigo
+val PremiumVioletSoft = Color(0xFFF0EDFF)   // Soft violet tint for bg
+val PremiumVioletMid  = Color(0xFFD6CFFE)   // Mid violet for containers
 
-// Legacy Aliases for seamless component compatibility
-val Emerald80 = Color(0xFFA7F3D0)
-val EmeraldGreen = BentoEmerald
-val EmeraldDark = Color(0xFF064E3B)
+// ── Semantic Accent Colors ────────────────────────────────────────────────
+val PremiumEmerald    = Color(0xFF00C48C)   // Positive / income green
+val PremiumEmeraldBg  = Color(0xFFE6FBF4)   // Emerald tint background
+val PremiumRose       = Color(0xFFFF4757)   // Expense / negative red
+val PremiumRoseBg     = Color(0xFFFFEBED)   // Rose tint background
+val PremiumAmber      = Color(0xFFFFA827)   // Warning / pending amber
+val PremiumAmberBg    = Color(0xFFFFF5E6)   // Amber tint background
 
-val TealSecondary = Color(0xFF0D9488)
-val TealLight = Color(0xFF99F6E4)
+// ── Hero Dark Card (Payday) ───────────────────────────────────────────────
+val PremiumHeroCard   = Color(0xFF111118)   // Deep dark hero card
+val PremiumHeroAccent = Color(0xFF6C52EF)   // Violet accent on dark
 
-val AmberTertiary = BentoAmber
-val AmberLight = BentoAmberLight
+// ── Legacy aliases for component compatibility ─────────────────────────────
+val BentoIndigoPrimary   = PremiumViolet
+val BentoIndigoDark      = Color(0xFF3D2DB5)
+val BentoIndigoLight     = PremiumVioletSoft
+val BentoIndigoContainer = PremiumVioletMid
 
-val CoralExpense = BentoRose
-val MintIncome = BentoEmerald
+val BentoSlateBg         = PremiumBg
+val BentoSlateCard       = PremiumSurface
+val BentoDarkCard        = PremiumInk
+val BentoCardBorder      = PremiumBorder
 
-val SoftBackgroundLight = BentoSlateBg
-val CardSurfaceLight = BentoSlateCard
+val BentoEmerald         = PremiumEmerald
+val BentoEmeraldLight    = PremiumEmeraldBg
+val BentoAmber           = PremiumAmber
+val BentoAmberLight      = PremiumAmberBg
+val BentoRose            = PremiumRose
+val BentoRoseLight       = PremiumRoseBg
 
-val SoftBackgroundDark = Color(0xFF0F172A)
-val CardSurfaceDark = Color(0xFF1E293B)
-
+// Legacy
+val Emerald80        = Color(0xFFA7F3D0)
+val EmeraldGreen     = PremiumEmerald
+val EmeraldDark      = Color(0xFF005C40)
+val TealSecondary    = Color(0xFF0D9488)
+val TealLight        = Color(0xFF99F6E4)
+val AmberTertiary    = PremiumAmber
+val AmberLight       = PremiumAmberBg
+val CoralExpense     = PremiumRose
+val MintIncome       = PremiumEmerald
+val SoftBackgroundLight = PremiumBg
+val CardSurfaceLight    = PremiumSurface
+val SoftBackgroundDark  = Color(0xFF0F172A)
+val CardSurfaceDark     = Color(0xFF1E293B)
