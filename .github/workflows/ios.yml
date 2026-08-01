@@ -32,9 +32,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           validate-wrappers: false
-          # Disable all caching — skiko.klib was previously cached in a corrupt
-          # state and keeps being restored, causing KLIB resolver failures.
-          # Fresh downloads are required until the cache is clean.
           cache-disabled: true
 
       - name: Make gradlew executable
@@ -42,6 +39,12 @@ jobs:
 
       - name: Create .env from example
         run: cp -n .env.example .env || touch .env
+
+      - name: Delete corrupt Skiko klib (force fresh re-download)
+        run: |
+          # The skiko-iossimulatorarm64 klib is cached in a corrupt state.
+          # Delete it so Gradle re-downloads a fresh, valid copy.
+          rm -rf ~/.gradle/caches/modules-2/files-2.1/org.jetbrains.skiko/
 
       - name: Build KMP shared iOS framework — Simulator (iosSimulatorArm64)
         run: |
