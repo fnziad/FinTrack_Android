@@ -40,6 +40,11 @@ debug.keystore
 *.keystore
 *.jks
 *.p12
+*.pem
+*.key
+*.cer
+*.der
+*.provisionprofile
 *.mobileprovision
 google-services.json
 GoogleService-Info.plist

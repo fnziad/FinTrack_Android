@@ -1,8 +1,8 @@
 name: Build Android APK
 
 # Triggers:
-#   develop  → Preview build (nightly): APK uploaded as TakaKoi-Preview-APK
-#   main     → Stable build (release):  APK uploaded as TakaKoi-Release-APK
+#   develop  → Preview debug build: APK uploaded as TakaKoi-Preview-Debug-APK
+#   main     → Stable debug validation: APK uploaded as TakaKoi-Stable-Debug-APK
 #   feature/* PRs → Validation only (must pass before merging to develop)
 on:
   push:
@@ -13,6 +13,9 @@ on:
     branches:
       - main
       - develop
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -33,9 +36,6 @@ jobs:
       uses: gradle/actions/setup-gradle@v4
       with:
         validate-wrappers: false
-
-    - name: Create .env from example
-      run: cp -n .env.example .env || touch .env
 
     - name: Generate Debug Keystore if missing
       run: |
@@ -62,7 +62,7 @@ jobs:
       if: github.ref == 'refs/heads/develop'
       uses: actions/upload-artifact@v4
       with:
-        name: TakaKoi-Preview-APK
+        name: TakaKoi-Preview-Debug-APK
         path: app/build/outputs/apk/debug/app-debug.apk
         retention-days: 14
 
@@ -71,6 +71,6 @@ jobs:
       if: github.ref == 'refs/heads/main'
       uses: actions/upload-artifact@v4
       with:
-        name: TakaKoi-Release-APK
+        name: TakaKoi-Stable-Debug-APK
         path: app/build/outputs/apk/debug/app-debug.apk
         retention-days: 90

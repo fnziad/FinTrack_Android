@@ -16,8 +16,8 @@ fix/bug-fix ─────────┘
 
 ### Branch Roles
 
-- **`main`**: The production-ready branch. Code here is always stable, fully tested, and tagged with version numbers (e.g. `v1.0.0`). Direct pushes to `main` are restricted; code enters `main` only via pull requests from `develop`.
-- **`develop`**: The active integration branch. Nightly preview APKs and frameworks are built from here. Developers branch off `develop` and merge back into `develop`.
+- **`main`**: The reviewed stable baseline. Code here must be green in both Android and iOS CI. Use pull requests from `develop`; store-ready signing is intentionally not part of the current CI artifacts.
+- **`develop`**: The active integration branch. Preview APKs and frameworks are built on pushes from here. Developers branch off `develop` and merge back into `develop`.
 - **`feature/<name>`**: Short-lived feature branches created from `develop` for specific features (e.g. `feature/recurring-payments`).
 - **`fix/<name>`**: Short-lived bug fix branches created from `develop` for resolving specific issues (e.g. `fix/payday-calculator`).
 
@@ -83,7 +83,7 @@ JAVA_HOME="$(brew --prefix openjdk@21)/libexec/openjdk.jdk/Contents/Home" \
    git checkout -b feature/my-new-feature
    ```
 2. **Commit your changes** with clear, semantic commit messages (e.g., `feat: add PDF report generator`, `fix: correct currency formatting in Ledger`).
-3. **Run local verification** (`./gradlew assembleDebug` and `:shared:linkDebugFrameworkIosSimulatorArm64`).
+3. **Run local verification** (`./gradlew assembleDebug` and `:shared:linkReleaseFrameworkIosSimulatorArm64`).
 4. **Push to GitHub** and open a PR against the `develop` branch.
 5. Ensure all **GitHub Actions CI checks** (`Build Android APK` and `iOS Framework Build`) pass cleanly.
 
@@ -91,4 +91,11 @@ JAVA_HOME="$(brew --prefix openjdk@21)/libexec/openjdk.jdk/Contents/Home" \
 
 ## 📄 License
 
-By contributing to TakaKoi, you agree that your contributions will be licensed under the project's [MIT License](LICENSE).
+By contributing to TakaKoi, you agree that your contributions will be licensed under the project's [Apache License 2.0](LICENSE).
+
+## 🔐 Public-repository rules
+
+- Never commit `.env`, API keys, service-account files, keystores, provisioning profiles, certificates, or local IDE state.
+- Keep sample/demo values fictional and avoid real names, addresses, account numbers, or financial records in source, screenshots, and tests.
+- Do not add analytics, cloud sync, or network calls without updating [PRIVACY.md](PRIVACY.md) and the store disclosure plan.
+- Report security issues privately using the process in [SECURITY.md](SECURITY.md); do not publish credentials in an issue or pull request.

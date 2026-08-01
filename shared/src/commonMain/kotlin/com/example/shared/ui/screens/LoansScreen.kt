@@ -476,7 +476,7 @@ fun AddLoanDialog(
                     value = personName,
                     onValueChange = { personName = it },
                     label = { Text("Person / Store Name") },
-                    placeholder = { Text("e.g. Mess Manager Tanvir, Roommate") },
+                    placeholder = { Text("e.g. Roommate or friend") },
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(

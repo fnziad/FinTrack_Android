@@ -429,7 +429,7 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = "TakaTrack v1.0 • All user profile, transaction & task data stored locally in offline Room database.",
+                    text = "TakaKoi v1.0 • All user profile, transaction & task data stored locally in offline Room database.",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

@@ -6,8 +6,6 @@
    See https://developer.android.com/about/versions/12/backup-restore
 -->
 <full-backup-content>
-    <!--
-   <include domain="sharedpref" path="."/>
-   <exclude domain="sharedpref" path="device.xml"/>
--->
+    <!-- Financial records stay on-device until encrypted sync/export exists. -->
+    <exclude domain="database" path="takatrack_database.db" />
 </full-backup-content>

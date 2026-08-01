@@ -99,7 +99,7 @@ class ExpenseRepository(
         val settings = UserSettingsEntity(
             id = 1,
             profileType = preset,
-            userName = "Demo User",
+            userName = "Sample User",
             initialCash = 25000.0,
             salaryDay = 1,
             currencySymbol = "৳",
@@ -120,7 +120,7 @@ class ExpenseRepository(
                 amount = 25000.0,
                 category = "Salary & Income",
                 subCategory = "Monthly Salary",
-                description = "Tech Solutions Ltd. Salary",
+                description = "Example Employer Salary",
                 dateEpochMillis = now - (15 * dayMs),
                 dayName = "1st",
                 isRecurring = true,
@@ -153,7 +153,7 @@ class ExpenseRepository(
                 amount = 8000.0,
                 category = "Food & Mess",
                 subCategory = "Mess Meal & Rent",
-                description = "Mess meal bill & seat rent for month",
+                description = "Shared housing and meal bill",
                 dateEpochMillis = now - (14 * dayMs),
                 dayName = "2nd"
             ),
@@ -162,7 +162,7 @@ class ExpenseRepository(
                 amount = 1200.0,
                 category = "Transport",
                 subCategory = "Metro Rail Pass",
-                description = "MRT Pass top-up (Uttara to Farmgate)",
+                description = "City transit pass top-up",
                 dateEpochMillis = now - (12 * dayMs),
                 dayName = "4th"
             ),
@@ -171,7 +171,7 @@ class ExpenseRepository(
                 amount = 350.0,
                 category = "Transport",
                 subCategory = "Rickshaw Fare",
-                description = "Rickshaw from Mess to Bus Stand",
+                description = "Local transit fare",
                 dateEpochMillis = now - (10 * dayMs),
                 dayName = "6th"
             ),
@@ -265,7 +265,7 @@ class ExpenseRepository(
         val sampleLoans = listOf(
             LoanEntity(
                 title = "Mess Utility & Gas Share",
-                personName = "Tanvir (Mess Manager)",
+                personName = "Roommate A (sample)",
                 amount = 1200.0,
                 paidAmount = 500.0,
                 loanType = "SHORT_TERM",
@@ -276,7 +276,7 @@ class ExpenseRepository(
             ),
             LoanEntity(
                 title = "Rickshaw & Metro Fare Borrowed",
-                personName = "Shakil (Colleague)",
+                personName = "Friend B (sample)",
                 amount = 350.0,
                 paidAmount = 0.0,
                 loanType = "SHORT_TERM",
@@ -305,7 +305,7 @@ class ExpenseRepository(
                 isCompleted = false
             ),
             TaskEntity(
-                title = "Repay ৳700 remaining mess share to Tanvir",
+                title = "Repay remaining shared expense",
                 category = "Loans",
                 dueDate = "20th of Month",
                 priority = "Medium",

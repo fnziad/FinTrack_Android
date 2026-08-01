@@ -205,7 +205,7 @@ fun DashboardScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = "🚀 Get Started with TakaTrack",
+                            text = "🚀 Get Started with TakaKoi",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary

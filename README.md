@@ -1,233 +1,138 @@
-# 📱 TakaKoi — Personal Finance & Budget Tracker (Android & iOS)
+# TakaKoi — Personal Finance & Budget Tracker
 
-[![Build Android APK](https://github.com/fnziad/FinTrack_Android/actions/workflows/android.yml/badge.svg?branch=main)](https://github.com/fnziad/FinTrack_Android/actions/workflows/android.yml)
-[![iOS Framework Build](https://github.com/fnziad/FinTrack_Android/actions/workflows/ios.yml/badge.svg?branch=main)](https://github.com/fnziad/FinTrack_Android/actions/workflows/ios.yml)
+[![Android CI](https://github.com/fnziad/TakaKoi/actions/workflows/android.yml/badge.svg?branch=main)](https://github.com/fnziad/TakaKoi/actions/workflows/android.yml)
+[![iOS CI](https://github.com/fnziad/TakaKoi/actions/workflows/ios.yml/badge.svg?branch=main)](https://github.com/fnziad/TakaKoi/actions/workflows/ios.yml)
 
-**TakaKoi** is a modern, high-performance cross-platform application built for intuitive expense tracking, budget management, and personal financial analytics on both **Android** and **iOS**. Built with **Kotlin Multiplatform (KMP)** and **Compose Multiplatform**, it features a premium editorial aesthetic using Material Design 3.
+TakaKoi is an Android and iOS personal-finance app built with Kotlin Multiplatform and Compose Multiplatform. It tracks expenses, budgets, savings goals, loans, and recurring income with a local-first Room database.
 
----
+The repository is open source, but the current CI artifacts are development/integration builds. Store distribution is not configured yet; see [Release readiness](#release-readiness).
 
-## 📸 Interface & Screenshots
+## Screenshots
 
-### 🍏 iOS App Interface (Compose Multiplatform on iOS)
-
-<p align="center">
-  <img src="docs/screenshots/ios_preview.png" alt="iOS App Preview" width="360" />
-</p>
-
-### 🤖 Android App Screens
+The repository includes sanitized Android UI screenshots for the dashboard, ledger, savings, and settings screens. Any sample records shown in them are fictional demo data and are not user data.
 
 | Dashboard | Ledger | Savings |
 |:-:|:-:|:-:|
 | ![Dashboard](docs/screenshots/dashboard.png) | ![Ledger](docs/screenshots/ledger.png) | ![Savings](docs/screenshots/savings.png) |
 
-| Loans & Debts | Settings |
-|:-:|:-:|
-| ![Loans](docs/screenshots/loans.png) | ![Settings](docs/screenshots/settings.png) |
+![Settings](docs/screenshots/settings.png)
 
----
+## Current privacy boundary
 
-## 📲 Try the App
+- User names, transactions, amounts, notes, savings goals, loans, and tasks are stored locally in the Room SQLite database.
+- The current app has no authentication, analytics, telemetry, cloud sync, or application network calls. The build intentionally does not include Firebase/Gemini runtime services.
+- Android backups are disabled and the finance database is excluded from Android backup rules. iOS database backup behavior is documented in [PRIVACY.md](PRIVACY.md).
+- The sample-data action is opt-in and uses fictional values. It can be cleared from Settings.
+- Do not put real credentials in this repository. Local `.env`, keystores, signing profiles, Google service files, and private certificates are ignored by Git.
 
-> **No build required.** Download directly from GitHub Actions CI artifacts.
+See [PRIVACY.md](PRIVACY.md) for the user-data boundary and [SECURITY.md](SECURITY.md) for vulnerability reporting and public-repository rules.
 
-### Android — Download & Install APK
+## Features
 
-1. Go to **[Actions → Build Android APK](https://github.com/fnziad/FinTrack_Android/actions/workflows/android.yml)**
-2. Click the latest **passing** workflow run on `main` (stable) or `develop` (preview)
-3. Under **Artifacts**, download:
-   - `TakaKoi-Release-APK` — from `main` (stable, recommended)
-   - `TakaKoi-Preview-APK` — from `develop` (latest features, may have rough edges)
-4. Transfer the `.apk` to your Android device
-5. Enable **Settings → Install unknown apps** for your file manager
-6. Open the APK and tap **Install**
+- Dashboard with spend pace, category breakdown, recurring income, and cost drivers
+- Income and expense ledger with filtering and history
+- Savings goals with progress tracking
+- Loan and debt tracking
+- Theme presets and shared Compose UI on Android and iOS
 
-> ⚠️ **Minimum Android version**: API 24 (Android 7.0 Nougat)
-
-### iOS — Simulator Testing (Developers only)
-
-iOS distribution to real devices requires an Apple Developer account and TestFlight.
-For simulator testing (developers):
-
-1. Go to **[Actions → Build iOS Framework](https://github.com/fnziad/FinTrack_Android/actions/workflows/ios.yml)**
-2. Download `TakaKoi-iOS-Simulator-Framework-Stable` or `-Preview`
-3. Follow the [Developer Setup → iOS](#-ios-app-iosapp) section to integrate with Xcode
-4. Run on Simulator with `Cmd + R`
-
----
-
-## ✨ Features
-
-- 📊 **Smart Dashboard**
-  - **Payday Hero Card**: Real-time countdown to next salary date
-  - **Spend Pace Tracker**: Live daily spending pace vs target
-  - **Cost Driver Analytics**: Highest category & largest single expense
-  - **Category Breakdown**: Doughnut + bar chart visualisations
-- 📜 **Ledger**: Income & expense tracking with instant filtering and history
-- 🎯 **Savings Goals**: Custom wallets with progress bars
-- 🤝 **Loans & Debt Management**: Track money owed and debt repayments
-- 🎨 **5 Theme Presets**: Light/dark with Indigo, Emerald, Ocean, Teal, Rose
-- 🔤 **Space Grotesk Typography**: Geometric editorial type system
-- 🍏📱 **Cross-Platform**: 100% shared Compose UI + business logic (KMP)
-
----
-
-## 🛠️ Tech Stack
-
-```
-TakaKoi/
-├── shared/            ← KMP shared module (ALL UI, logic, and data)
-│   ├── commonMain/    ← Compose Multiplatform UI, ViewModel, Room DAOs/Entities
-│   ├── androidMain/   ← SQLite driver init for Android
-│   └── iosMain/       ← UIViewController wrapper for iOS
-├── app/               ← Android app host (thin: just MainActivity)
-└── iosApp/            ← iOS app host (thin: SwiftUI wrapper)
-```
+## Tech stack
 
 | Layer | Technology |
 |---|---|
 | UI | Compose Multiplatform + Material Design 3 |
-| Architecture | MVVM — StateFlow + Kotlin Coroutines |
-| Database | Room KMP 2.7+ (SQLite Bundled driver) |
-| Networking | Ktor 3.x (OkHttp on Android, Darwin on iOS) |
-| Date/Time | `kotlinx-datetime` |
-| Build | Gradle 9.3.1 + AGP 9.1.1 + KMP 2.0.21 + Java 21 |
+| Architecture | MVVM, StateFlow, Kotlin Coroutines |
+| Database | Room KMP 2.7+ with bundled SQLite driver |
+| Date/time | `kotlinx-datetime` |
+| Build | Gradle 9.3.1, AGP 9.1.1, Kotlin/JVM 2.2.10, KMP 2.0.21, Java 21 |
 
----
+Ktor remains a dependency planned for a future sync feature; there are no current runtime HTTP calls.
 
-## 🌿 Branch Strategy
+## Branches and CI
 
-| Branch | Purpose | CI Artifacts |
+| Branch | Purpose | Artifacts |
 |---|---|---|
-| `main` | ✅ **Stable releases** — always green, tagged | `TakaKoi-Release-APK` + `TakaKoi-iOS-*-Framework-Stable` (90-day) |
-| `develop` | 🔄 **Active development** — daily work | `TakaKoi-Preview-APK` + `TakaKoi-iOS-*-Framework-Preview` (14-day) |
-| `feature/*` | 🧪 **Feature branches** — short-lived, PRs only | CI validation only (no artifact upload) |
+| `main` | Stable, reviewed baseline | `TakaKoi-Stable-Debug-APK` and unsigned iOS framework integration artifacts (90 days) |
+| `develop` | Active development | `TakaKoi-Preview-Debug-APK` and unsigned iOS framework integration artifacts (14 days) |
+| `feature/*`, `fix/*` | Short-lived pull-request branches | CI validation only |
 
-```
-feature/my-feature
-       ↓ Pull Request (CI must pass)
-   develop  ← your active workspace
-       ↓ Pull Request (CI must pass)
-    main    ← stable, tagged releases (v1.x.x)
-```
+Both workflows run on pushes to `main`/`develop` and pull requests targeting those branches. The Android workflow deliberately builds `assembleDebug` so it never handles a production signing key. The resulting APK is useful for testing only; it is not a Play Store release. The iOS workflow builds unsigned simulator/device frameworks and an unsigned simulator container; TestFlight/App Store signing is a separate future release step.
 
-**Rules:**
-- Never commit directly to `main`
-- `develop` is always in a working, buildable state
-- All `feature/*` branches must pass CI before merging to `develop`
-- See [CONTRIBUTING.md](CONTRIBUTING.md) for full workflow
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution flow.
 
----
-
-## 🚀 Developer Setup
+## Developer setup
 
 ### Prerequisites
 
-| Tool | Version | Install |
-|---|---|---|
-| JDK | 21 (OpenJDK / Temurin) | `brew install openjdk@21` |
-| Android SDK | API 36 target, API 24 min | Android Studio or `sdkmanager` |
-| Xcode | 15.0+ (iOS only) | Mac App Store |
-| Kotlin Multiplatform | 2.0.21 | via Gradle |
+- JDK 21 (Temurin/OpenJDK)
+- Android SDK API 36 (minimum API 24)
+- Xcode 15 or newer for iOS development
 
-### Environment Setup
-
-Set `JAVA_HOME` to JDK 21 before building (required — system JDK 26+ breaks the Android SDK `jlink` step):
+Set JDK 21 before Gradle commands on macOS:
 
 ```bash
 export JAVA_HOME="$(brew --prefix openjdk@21)/libexec/openjdk.jdk/Contents/Home"
 ```
 
-Add this to your `~/.zshrc` or `~/.bashrc` to make it permanent.
-
-### Clone & Setup
+Clone the repository and use the development branch:
 
 ```bash
-git clone https://github.com/fnziad/FinTrack_Android.git TakaKoi
+git clone https://github.com/fnziad/TakaKoi.git
 cd TakaKoi
-
-# Work on the active development branch
 git checkout develop
 ```
 
----
+### Android
 
-### 🤖 Android App (`app/`)
-
-**Build Debug APK:**
 ```bash
-JAVA_HOME="$(brew --prefix openjdk@21)/libexec/openjdk.jdk/Contents/Home" \
-  ./gradlew assembleDebug --no-configuration-cache
-```
-
-**Install on connected device / emulator:**
-```bash
+./gradlew assembleDebug --no-configuration-cache
 ./gradlew :app:installDebug
 ```
 
-**Run via android-cli:**
+The debug build uses a locally generated debug keystore when needed. Never reuse it for a store release.
+
+### iOS
+
 ```bash
-android run --apks=app/build/outputs/apk/debug/app-debug.apk --device=emulator-5554
+./gradlew :shared:linkReleaseFrameworkIosSimulatorArm64 --no-configuration-cache
 ```
 
----
+Open `iosApp/iosApp.xcodeproj` in Xcode and run an iOS Simulator target. The project intentionally has no committed Apple Developer Team ID; configure signing locally or in a protected release workflow.
 
-### 🍏 iOS App (`iosApp/`)
+## CI/CD details
 
-**Build KMP Shared Framework:**
-```bash
-JAVA_HOME="$(brew --prefix openjdk@21)/libexec/openjdk.jdk/Contents/Home" \
-  ./gradlew :shared:linkDebugFrameworkIosSimulatorArm64 --no-configuration-cache
-```
+### Android (`.github/workflows/android.yml`)
 
-**Run in Xcode:**
-1. Open `iosApp/iosApp.xcodeproj` in Xcode
-2. Select an **iOS Simulator** target (e.g., iPhone 15 Pro)
-3. Press `Cmd + R`
+- Ubuntu runner with Temurin JDK 21
+- Read-only repository permissions
+- Generates a throwaway debug keystore in CI
+- Uploads debug APK artifacts only; no release signing secrets are used
 
-> The Xcode project is pre-configured to reference the KMP shared framework from `shared/build/bin/`.
+### iOS (`.github/workflows/ios.yml`)
 
----
+- macOS runner with Temurin JDK 21
+- Builds complete Release KMP frameworks for simulator and device
+- Builds the Xcode container with code signing disabled
+- Uploads integration artifacts only; provisioning profiles and App Store certificates are intentionally absent
 
-## ⚙️ CI/CD Pipelines
+## Release readiness
 
-Two GitHub Actions workflows run on every push to `main` and `develop`, and on all PRs:
+Before publishing to Google Play or the App Store, complete all of the following:
 
-### Android Build (`.github/workflows/android.yml`)
-- **Runner**: `ubuntu-latest`
-- **JDK**: Temurin 21 (explicitly pinned — avoids system JDK 26 `jlink` issue)
-- **Steps**: Checkout → JDK 21 → Gradle setup → Create `.env` → Generate keystore → `assembleDebug`
-- **Artifacts**:
-  - `develop` push → `TakaKoi-Preview-APK` (14 days)
-  - `main` push → `TakaKoi-Release-APK` (90 days)
+1. Review the privacy boundary and publish accurate Play Data Safety/App Store privacy disclosures.
+2. Add an encrypted, user-consented sync/export design if cloud backup is introduced.
+3. Configure production package/bundle IDs, version codes, signing certificates, provisioning profiles, and protected CI secrets.
+4. Build and sign an Android App Bundle and iOS archive/TestFlight build in a separate protected workflow.
+5. Add the required iOS privacy manifest and verify third-party dependency/font notices.
+6. Tag the exact reviewed commit and attach release notes; do not treat CI debug artifacts as production binaries.
 
-### iOS Build (`.github/workflows/ios.yml`)
-- **Runner**: `macos-latest` + Xcode toolchain
-- **JDK**: Temurin 21 (explicitly pinned per-step)
-- **Steps**: Checkout → JDK 21 → `linkReleaseFrameworkIosSimulatorArm64` → `linkReleaseFrameworkIosArm64`
-- **Artifacts**:
-  - `develop` push → `TakaKoi-iOS-*-Framework-Preview` (14 days)
-  - `main` push → `TakaKoi-iOS-*-Framework-Stable` (90 days)
+## Roadmap
 
----
+- Push notifications for payday reminders
+- Optional encrypted sync and backup
+- Recurring transaction automation
+- CSV/PDF exports
+- TestFlight distribution
 
-## 🗺️ Roadmap
+## License
 
-- [x] **iOS Support** — Kotlin Multiplatform + Compose Multiplatform migration complete
-- [ ] Push notifications for payday reminders
-- [ ] Cloud sync and backup via Firebase
-- [ ] Recurring transaction automation
-- [ ] Export transactions to CSV / PDF reports
-- [ ] TestFlight distribution for iOS beta testers
-
----
-
-## 🤝 Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for branch workflow, commit conventions, and PR guidelines.
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License — see the repository files for details.
+The source code is licensed under the [Apache License 2.0](LICENSE). Bundled fonts and other third-party materials retain their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
