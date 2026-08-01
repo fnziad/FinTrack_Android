@@ -1,10 +1,21 @@
-name: iOS Framework Build
+name: Build iOS Framework
 
+# Triggers:
+#   develop  → Preview build: uploads Simulator + Device frameworks
+#   main     → Stable build:  uploads Simulator + Device frameworks
+#   feature/* PRs → Validation only (must pass before merging to develop)
+#
+# NOTE: This builds and validates the KMP shared framework for iOS.
+# For actual device distribution, use TestFlight with the Device framework artifact.
 on:
   push:
-    branches: [ "main", "master", "feature/ios-kmp" ]
+    branches:
+      - main
+      - develop
   pull_request:
-    branches: [ "main", "master" ]
+    branches:
+      - main
+      - develop
 
 jobs:
   build-ios:
@@ -46,16 +57,36 @@ jobs:
             --no-daemon \
             --stacktrace
 
-      - name: Upload Simulator Framework Artifact
+      # develop → Preview frameworks
+      - name: Upload Preview iOS Simulator Framework (develop)
+        if: github.ref == 'refs/heads/develop'
         uses: actions/upload-artifact@v4
         with:
-          name: shared-ios-framework-simulator
+          name: TakaKoi-iOS-Simulator-Framework-Preview
           path: shared/build/bin/iosSimulatorArm64/releaseFramework/
-          retention-days: 7
+          retention-days: 14
 
-      - name: Upload Device Framework Artifact
+      - name: Upload Preview iOS Device Framework (develop)
+        if: github.ref == 'refs/heads/develop'
         uses: actions/upload-artifact@v4
         with:
-          name: shared-ios-framework-device
+          name: TakaKoi-iOS-Device-Framework-Preview
           path: shared/build/bin/iosArm64/releaseFramework/
-          retention-days: 7
+          retention-days: 14
+
+      # main → Stable release frameworks
+      - name: Upload Stable iOS Simulator Framework (main)
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: TakaKoi-iOS-Simulator-Framework-Stable
+          path: shared/build/bin/iosSimulatorArm64/releaseFramework/
+          retention-days: 90
+
+      - name: Upload Stable iOS Device Framework (main)
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: TakaKoi-iOS-Device-Framework-Stable
+          path: shared/build/bin/iosArm64/releaseFramework/
+          retention-days: 90

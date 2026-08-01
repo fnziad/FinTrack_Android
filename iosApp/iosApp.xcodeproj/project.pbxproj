@@ -9,8 +9,8 @@
 /* Begin PBXBuildFile section */
 		A10000012C5B000100000001 /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000022C5B000100000001 /* iOSApp.swift */; };
 		A10000032C5B000100000001 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000042C5B000100000001 /* ContentView.swift */; };
-		A10000052C5B000100000001 /* shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A10000062C5B000100000001 /* shared.framework */; };
-		A10000072C5B000100000001 /* shared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A10000062C5B000100000001 /* shared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A10000052C5B000100000001 /* ../shared/build/bin/iosSimulatorArm64/debugFramework/shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A10000062C5B000100000001 /* ../shared/build/bin/iosSimulatorArm64/debugFramework/shared.framework */; };
+		A10000072C5B000100000001 /* ../shared/build/bin/iosSimulatorArm64/debugFramework/shared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A10000062C5B000100000001 /* ../shared/build/bin/iosSimulatorArm64/debugFramework/shared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -20,7 +20,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				A10000072C5B000100000001 /* shared.framework in Embed Frameworks */,
+				A10000072C5B000100000001 /* ../shared/build/bin/iosSimulatorArm64/debugFramework/shared.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -30,7 +30,7 @@
 /* Begin PBXFileReference section */
 		A10000022C5B000100000001 /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
 		A10000042C5B000100000001 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		A10000062C5B000100000001 /* shared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = "../shared/build/bin/iosSimulatorArm64/debugFramework/shared.framework"; sourceTree = "<group>"; };
+		A10000062C5B000100000001 /* ../shared/build/bin/iosSimulatorArm64/debugFramework/shared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ../shared/build/bin/iosSimulatorArm64/debugFramework/shared.framework; sourceTree = "<group>"; };
 		A10000092C5B000100000001 /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -39,7 +39,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A10000052C5B000100000001 /* shared.framework in Frameworks */,
+				A10000052C5B000100000001 /* ../shared/build/bin/iosSimulatorArm64/debugFramework/shared.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -49,13 +49,13 @@
 		A100000B2C5B000100000001 = {
 			isa = PBXGroup;
 			children = (
-				A100000C2C5B000100000001 /* iosApp */,
+				A100000C2C5B000100000001,
 				A100000D2C5B000100000001 /* Frameworks */,
 				A100000E2C5B000100000001 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		A100000C2C5B000100000001 /* iosApp */ = {
+		A100000C2C5B000100000001 = {
 			isa = PBXGroup;
 			children = (
 				A10000022C5B000100000001 /* iOSApp.swift */,
@@ -66,7 +66,7 @@
 		A100000D2C5B000100000001 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				A10000062C5B000100000001 /* shared.framework */,
+				A10000062C5B000100000001 /* ../shared/build/bin/iosSimulatorArm64/debugFramework/shared.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -108,7 +108,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 2700;
 				TargetAttributes = {
 					A100000F2C5B000100000001 = {
 						CreatedOnToolsVersion = 15.0;
@@ -124,7 +124,7 @@
 				Base,
 			);
 			mainGroup = A100000B2C5B000100000001;
-			productRefGroup = A100000E2C5B000100000001;
+			productRefGroup = A100000E2C5B000100000001 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -150,7 +150,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"YES\" = \"$OVERRIDE_KMP_BUILD\" ]; then\n  exit 0\nfi\ncd \"$SRCROOT/..\"\nJAVA_HOME=\"$(brew --prefix openjdk@21)/libexec/openjdk.jdk/Contents/Home\" ./gradlew :shared:embedAndSignAppleFrameworkForXcode\n";
+			shellScript = "if [ \"YES\" = \"$OVERRIDE_KMP_BUILD\" ]; then\n  exit 0\nfi\nexport PATH=\"/opt/homebrew/bin:/usr/local/bin:$PATH\"\nif [ -d \"/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home\" ]; then\n  export JAVA_HOME=\"/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home\"\nelif [ -d \"/usr/local/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home\" ]; then\n  export JAVA_HOME=\"/usr/local/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home\"\nfi\ncd \"$SRCROOT/..\"\n./gradlew :shared:embedAndSignAppleFrameworkForXcode\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -178,6 +178,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASE = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
@@ -223,6 +224,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -239,6 +241,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASE = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
@@ -277,6 +280,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
@@ -289,17 +293,21 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				INFOPLIST_KEY_CADisableMinimumFrameDurationOnPhone = YES;
+				DEVELOPMENT_TEAM = 9JQYF3D4NV;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../shared/build/bin/iosSimulatorArm64/debugFramework",
 					"$(SRCROOT)/../shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CADisableMinimumFrameDurationOnPhone = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = TakaKoi;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = "$(RECOMMENDED_IPHONEOS_DEPLOYMENT_TARGET)";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -320,16 +328,20 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9JQYF3D4NV;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../shared/build/bin/iosSimulatorArm64/releaseFramework",
 					"$(SRCROOT)/../shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = TakaKoi;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = "$(RECOMMENDED_IPHONEOS_DEPLOYMENT_TARGET)";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -346,20 +358,20 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A10000142C5B000100000001 /* Build configuration list for PBXProject "iosApp" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A10000152C5B000100000001 /* Debug */,
-				A10000162C5B000100000001 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		A10000102C5B000100000001 /* Build configuration list for PBXNativeTarget "iosApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A10000172C5B000100000001 /* Debug */,
 				A10000182C5B000100000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A10000142C5B000100000001 /* Build configuration list for PBXProject "iosApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000152C5B000100000001 /* Debug */,
+				A10000162C5B000100000001 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

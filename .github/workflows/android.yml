@@ -1,19 +1,23 @@
 name: Build Android APK
 
+# Triggers:
+#   develop  → Preview build (nightly): APK uploaded as TakaKoi-Preview-APK
+#   main     → Stable build (release):  APK uploaded as TakaKoi-Release-APK
+#   feature/* PRs → Validation only (must pass before merging to develop)
 on:
   push:
-    branches: [ "main", "master", "feature/ios-kmp" ]
+    branches:
+      - main
+      - develop
   pull_request:
-    branches: [ "main", "master" ]
-
-env:
-  # Pin JDK 21 explicitly — macOS runners default to system JDK 26 which
-  # breaks the Android SDK 36 jlink/jmod transform step.
-  JAVA_HOME: ${{ steps.setup-java.outputs.path }}
+    branches:
+      - main
+      - develop
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -37,18 +41,39 @@ jobs:
     - name: Generate Debug Keystore if missing
       run: |
         if [ ! -f debug.keystore ]; then
-          keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          keytool -genkey -v \
+            -keystore debug.keystore \
+            -storepass android \
+            -alias androiddebugkey \
+            -keypass android \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
         fi
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
     - name: Build Debug APK
+      env:
+        JAVA_HOME: ${{ steps.setup-java.outputs.path }}
       run: ./gradlew assembleDebug --no-configuration-cache --stacktrace
 
-    - name: Upload Debug APK Artifact
+    # develop branch → Preview build artifact
+    - name: Upload Preview APK (develop branch)
+      if: github.ref == 'refs/heads/develop'
       uses: actions/upload-artifact@v4
       with:
-        name: TakaKoi-Debug-APK
+        name: TakaKoi-Preview-APK
         path: app/build/outputs/apk/debug/app-debug.apk
-        retention-days: 7
+        retention-days: 14
+
+    # main branch → Stable release artifact
+    - name: Upload Release APK (main branch)
+      if: github.ref == 'refs/heads/main'
+      uses: actions/upload-artifact@v4
+      with:
+        name: TakaKoi-Release-APK
+        path: app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 90
