@@ -1,12 +1,9 @@
-name: Build iOS Framework
+name: Build iOS Framework & App
 
 # Triggers:
 #   develop  → Preview build: uploads Simulator + Device frameworks
 #   main     → Stable build:  uploads Simulator + Device frameworks
 #   feature/* PRs → Validation only (must pass before merging to develop)
-#
-# NOTE: This builds and validates the KMP shared framework for iOS.
-# For actual device distribution, use TestFlight with the Device framework artifact.
 on:
   push:
     branches:
@@ -56,6 +53,17 @@ jobs:
             --no-configuration-cache \
             --no-daemon \
             --stacktrace
+
+      - name: Build iOS App Container (xcodebuild)
+        env:
+          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
+        run: |
+          xcodebuild -project iosApp/iosApp.xcodeproj \
+            -scheme iosApp \
+            -destination 'generic/platform=iOS Simulator' \
+            -configuration Release \
+            OVERRIDE_KMP_BUILD=YES \
+            CODE_SIGNING_ALLOWED=NO build
 
       # develop → Preview frameworks
       - name: Upload Preview iOS Simulator Framework (develop)
