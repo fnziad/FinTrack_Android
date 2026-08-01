@@ -1,8 +1,8 @@
 name: Build iOS Framework & App
 
 # Triggers:
-#   develop  → Preview build: uploads Simulator + Device frameworks
-#   main     → Stable build:  uploads Simulator + Device frameworks
+#   develop   → Preview build: uploads Simulator + Device frameworks
+#   main      → Stable build:  uploads Simulator + Device frameworks
 #   feature/* PRs → Validation only (must pass before merging to develop)
 on:
   push:
@@ -29,6 +29,11 @@ jobs:
           java-version: '21'
           cache: 'gradle'
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          validate-wrappers: false
+
       - name: Make gradlew executable
         run: chmod +x gradlew
 
@@ -39,14 +44,12 @@ jobs:
         run: |
           ./gradlew :shared:linkReleaseFrameworkIosSimulatorArm64 \
             --no-configuration-cache \
-            --no-daemon \
             --stacktrace
 
       - name: Build KMP shared iOS framework — Device (iosArm64)
         run: |
           ./gradlew :shared:linkReleaseFrameworkIosArm64 \
             --no-configuration-cache \
-            --no-daemon \
             --stacktrace
 
       - name: Build iOS App Container (xcodebuild)
@@ -58,7 +61,8 @@ jobs:
             OVERRIDE_KMP_BUILD=YES \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO build
+            CODE_SIGNING_ALLOWED=NO \
+            build
 
       # develop → Preview frameworks
       - name: Upload Preview iOS Simulator Framework (develop)
