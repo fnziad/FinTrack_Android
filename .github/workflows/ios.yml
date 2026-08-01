@@ -23,7 +23,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up JDK 21
-        id: setup-java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -37,8 +36,6 @@ jobs:
         run: cp -n .env.example .env || touch .env
 
       - name: Build KMP shared iOS framework — Simulator (iosSimulatorArm64)
-        env:
-          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
         run: |
           ./gradlew :shared:linkReleaseFrameworkIosSimulatorArm64 \
             --no-configuration-cache \
@@ -46,8 +43,6 @@ jobs:
             --stacktrace
 
       - name: Build KMP shared iOS framework — Device (iosArm64)
-        env:
-          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
         run: |
           ./gradlew :shared:linkReleaseFrameworkIosArm64 \
             --no-configuration-cache \
@@ -55,14 +50,14 @@ jobs:
             --stacktrace
 
       - name: Build iOS App Container (xcodebuild)
-        env:
-          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
         run: |
           xcodebuild -project iosApp/iosApp.xcodeproj \
             -scheme iosApp \
             -destination 'generic/platform=iOS Simulator' \
             -configuration Release \
             OVERRIDE_KMP_BUILD=YES \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO build
 
       # develop → Preview frameworks
