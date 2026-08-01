@@ -32,7 +32,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           validate-wrappers: false
-          cache-disabled: true
+          # Skiko is pinned to a complete artifact in shared/build.gradle.kts;
+          # keep the normal Gradle cache enabled for the remaining dependencies.
 
       - name: Make gradlew executable
         run: chmod +x gradlew
@@ -40,24 +41,16 @@ jobs:
       - name: Create .env from example
         run: cp -n .env.example .env || touch .env
 
-      - name: Delete corrupt Skiko klib (force fresh re-download)
-        run: |
-          # The skiko-iossimulatorarm64 klib is cached in a corrupt state.
-          # Delete it so Gradle re-downloads a fresh, valid copy.
-          rm -rf ~/.gradle/caches/modules-2/files-2.1/org.jetbrains.skiko/
-
       - name: Build KMP shared iOS framework — Simulator (iosSimulatorArm64)
         run: |
           ./gradlew :shared:linkReleaseFrameworkIosSimulatorArm64 \
             --no-configuration-cache \
-            --no-build-cache \
             --stacktrace
 
       - name: Build KMP shared iOS framework — Device (iosArm64)
         run: |
           ./gradlew :shared:linkReleaseFrameworkIosArm64 \
             --no-configuration-cache \
-            --no-build-cache \
             --stacktrace
 
       - name: Build iOS App Container (xcodebuild)

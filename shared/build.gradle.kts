@@ -9,6 +9,19 @@ plugins {
   alias(libs.plugins.androidx.room)
 }
 
+// Skiko 0.8.18 is published with a truncated iOS simulator klib (the
+// repository metadata advertises 42 MB, but the artifact is only 19 MB).
+// Keep the Compose dependency graph otherwise unchanged while resolving the
+// first complete compatible Skiko release.
+configurations.configureEach {
+  resolutionStrategy.eachDependency {
+    if (requested.group == "org.jetbrains.skiko") {
+      useVersion("0.9.22.2")
+      because("Skiko 0.8.18 iOS klib is truncated upstream")
+    }
+  }
+}
+
 room {
   schemaDirectory("$projectDir/schemas")
 }
@@ -84,5 +97,3 @@ dependencies {
   add("kspIosArm64", libs.androidx.room.compiler)
   add("kspAndroid", libs.androidx.room.compiler)
 }
-
-
