@@ -1,4 +1,4 @@
-# IDE & System Files
+# OS & IDE Files
 .DS_Store
 .idea/
 *.iml
@@ -8,6 +8,7 @@
 .idea/workspace.xml
 .idea/navEditor.xml
 .idea/assetWizardSettings.xml
+*.log
 
 # Gradle & Build Outputs
 .gradle/
@@ -26,17 +27,22 @@ build/
 **/kspCaches/
 **/generated/
 
-# iOS & Xcode Artifacts
+# iOS & Xcode User Data & Artifacts
 iosApp/DerivedData/
-iosApp/iosApp.xcodeproj/project.xcworkspace/xcuserdata/
-iosApp/iosApp.xcodeproj/xcuserdata/
+**/xcuserdata/
 *.xcuserstate
 .swiftpm/
 
-# Local Configuration & Secrets
+# Secrets, Credentials & Local Configs (PRIVACY & SECURITY)
 local.properties
 .env
 debug.keystore
+*.keystore
+*.jks
+*.p12
+*.mobileprovision
+google-services.json
+GoogleService-Info.plist
 
 # Temporary Verification Files
 kmp_ios_*.png
