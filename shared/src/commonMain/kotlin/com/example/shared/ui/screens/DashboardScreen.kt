@@ -1,0 +1,1322 @@
+package com.example.shared.ui.screens
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.Add
+import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.CheckCircleOutline
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.automirrored.filled.ListAlt
+import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Savings
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.shared.data.model.TaskEntity
+import com.example.shared.ui.components.CategoryBarChart
+import com.example.shared.ui.components.DoughnutChart
+import com.example.shared.ui.theme.BentoAmber
+import com.example.shared.ui.theme.BentoAmberLight
+import com.example.shared.ui.theme.BentoCardBorder
+import com.example.shared.ui.theme.BentoDarkCard
+import com.example.shared.ui.theme.BentoEmerald
+import com.example.shared.ui.theme.BentoEmeraldLight
+import com.example.shared.ui.theme.BentoIndigoContainer
+import com.example.shared.ui.theme.BentoIndigoLight
+import com.example.shared.ui.theme.BentoIndigoPrimary
+import com.example.shared.ui.theme.BentoRose
+import com.example.shared.ui.theme.CoralExpense
+import com.example.shared.ui.theme.PremiumBlack
+import com.example.shared.ui.theme.PremiumBorder
+import com.example.shared.ui.theme.PremiumEmerald
+import com.example.shared.ui.theme.PremiumEmeraldBg
+import com.example.shared.ui.theme.PremiumRose
+import com.example.shared.ui.theme.PremiumRoseBg
+import com.example.shared.ui.theme.PremiumViolet
+import com.example.shared.ui.theme.PremiumVioletSoft
+import com.example.shared.ui.viewmodel.ExpenseViewModel
+
+@Composable
+fun DashboardScreen(
+    viewModel: ExpenseViewModel,
+    onAddExpenseClick: () -> Unit,
+    onNavigateToLedger: () -> Unit = {},
+    onNavigateToLoans: () -> Unit = {},
+    onNavigateToSavings: () -> Unit = {},
+    onNavigateToSettings: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    val uiState by viewModel.dashboardUiState.collectAsState()
+    val userSettings by viewModel.userSettings.collectAsState()
+    val loans by viewModel.allLoans.collectAsState()
+    val transactions by viewModel.allTransactions.collectAsState()
+    val tasks by viewModel.allTasks.collectAsState()
+
+    val rawProfileName = userSettings?.userName.orEmpty()
+    val profileName = if (rawProfileName.isNotBlank()) rawProfileName else "My Expense Tracker"
+    val symbol = uiState.currencySymbol
+
+    val totalIOwe = loans.filter { it.direction == "I_OWE" && !it.isSettled }.sumOf { it.amount - it.paidAmount }
+    val totalOwedToMe = loans.filter { it.direction == "OWED_TO_ME" && !it.isSettled }.sumOf { it.amount - it.paidAmount }
+
+    var showProfileSetupDialog by remember { mutableStateOf(false) }
+    var showAddTaskDialog by remember { mutableStateOf(false) }
+
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp)
+                .padding(top = 20.dp)
+        ) {
+            // Header Section - Premium Editorial
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    if (rawProfileName.isNotBlank()) {
+                        val now = kotlinx.datetime.Clock.System.now()
+                        val hour = now.toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault()).hour
+                        val greeting = when {
+                            hour in 5..11 -> "morning"
+                            hour in 12..17 -> "afternoon"
+                            else -> "evening"
+                        }
+                        Text(
+                            text = "Good $greeting,",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Text(
+                            text = profileName,
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    } else {
+                        Text(
+                            text = "TAKAKOI",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            letterSpacing = 3.sp,
+                        )
+                        Text(
+                            text = "Dashboard",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(CircleShape)
+                        .background(PremiumBlack)
+                        .clickable { showProfileSetupDialog = true },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Profile",
+                        tint = Color.White,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+            }
+
+            // Quick Banner for Empty / Fresh State
+            if (transactions.isEmpty() && uiState.initialAmount == 0.0) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp)
+                        .border(1.dp, MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(20.dp)),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f))
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "🚀 Get Started with TakaTrack",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Set your custom starting budget or click below to load sample demo data and see how charts and tracking work.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Button(
+                                onClick = { showProfileSetupDialog = true },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Text("Set Up Profile", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = MaterialTheme.colorScheme.onPrimary)
+                            }
+
+                            OutlinedButton(
+                                onClick = { viewModel.loadDemoData() },
+                                modifier = Modifier.weight(1f).testTag("btn_load_sample_demo"),
+                                shape = RoundedCornerShape(12.dp),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Load Sample Data", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ── Hero Card — Full Width, Deep Ink ──────────────────────────
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showProfileSetupDialog = true }
+                    .testTag("stat_days_until_salary"),
+                shape = RoundedCornerShape(28.dp),
+                colors = CardDefaults.cardColors(containerColor = PremiumBlack),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 22.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "Days until payday",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.White.copy(alpha = 0.5f),
+                            letterSpacing = 0.3.sp
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "${uiState.daysUntilSalary}",
+                            style = MaterialTheme.typography.headlineLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            letterSpacing = (-1).sp
+                        )
+                    }
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text(
+                            text = "Remaining",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.White.copy(alpha = 0.5f)
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "$symbol${uiState.walletCash.toInt()}",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = PremiumEmerald,
+                            letterSpacing = (-0.5).sp
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // ── Two Metric Cards Side by Side ─────────────────────────────
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Starting Budget Card
+                Card(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { showProfileSetupDialog = true }
+                        .testTag("stat_initial_amount"),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, PremiumBorder)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Box(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(PremiumEmeraldBg),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.AccountBalanceWallet,
+                                contentDescription = null,
+                                tint = PremiumEmerald,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = "$symbol${uiState.initialAmount.toInt()}",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = "Starting budget",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                // Budget Card
+                Card(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { onNavigateToLedger() }
+                        .testTag("stat_wallet_cash"),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = PremiumVioletSoft),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Box(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(PremiumViolet.copy(alpha = 0.15f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Savings,
+                                contentDescription = null,
+                                tint = PremiumViolet,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = "$symbol${uiState.walletCash.toInt()}",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = PremiumViolet,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = "Cash on hand",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = PremiumViolet.copy(alpha = 0.6f)
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // ── Spending Metrics Row ────────────────────────────────────
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Spent Today Card
+                Card(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { onNavigateToLedger() }
+                        .testTag("stat_spent_today"),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = PremiumRoseBg),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "Spent today",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = PremiumRose.copy(alpha = 0.7f)
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "$symbol${uiState.spentToday.toInt()}",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = PremiumRose,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = "$symbol${uiState.totalSpentTillToday.toInt()} total",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = PremiumRose.copy(alpha = 0.5f)
+                        )
+                    }
+                }
+
+                // Daily Avg Card
+                Card(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { onNavigateToLedger() }
+                        .testTag("stat_daily_avg"),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, PremiumBorder)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "Daily avg",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "$symbol${uiState.dailyAvgSpent.toInt()}",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = "Target $symbol${uiState.targetAvg.toInt()}/day",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = PremiumEmerald
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // DAILY SPEND PACE & TARGET BUDGET TRACKER
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(24.dp))
+                    .testTag("stat_run_rate_card"),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+            ) {
+                Column(modifier = Modifier.padding(18.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "🎯 DAILY SPEND PACE TRACKER",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            letterSpacing = 0.5.sp,
+                            modifier = Modifier.weight(1f, fill = false)
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        val statusBadgeBg = when (uiState.runRateStatus) {
+                            "ON_TRACK" -> BentoEmerald.copy(alpha = 0.15f)
+                            "WARNING" -> BentoAmber.copy(alpha = 0.15f)
+                            else -> BentoRose.copy(alpha = 0.15f)
+                        }
+                        val statusBadgeTxt = when (uiState.runRateStatus) {
+                            "ON_TRACK" -> BentoEmerald
+                            "WARNING" -> BentoAmber
+                            else -> BentoRose
+                        }
+                        val statusText = when (uiState.runRateStatus) {
+                            "ON_TRACK" -> "ON TRACK"
+                            "WARNING" -> "CAUTION"
+                            else -> "HIGH PACE"
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(statusBadgeBg)
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = statusText,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = statusBadgeTxt
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "CURRENT DAILY PACE",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "$symbol${uiState.currentRunRate.toInt()}/day",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = if (uiState.runRateStatus == "OVER_BUDGET") BentoRose else MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "TARGET MAX PACE",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "$symbol${uiState.requiredRunRate.toInt()}/day",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = BentoEmerald
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    if (uiState.targetSavingsGoal > 0) {
+                        Column {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "Target Savings: $symbol${uiState.targetSavingsGoal.toInt()}",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    text = "Projected: $symbol${uiState.projectedSavings.toInt()}",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = BentoEmerald
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                            androidx.compose.material3.LinearProgressIndicator(
+                                progress = { uiState.savingsProgressPct },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(8.dp)
+                                    .clip(RoundedCornerShape(4.dp)),
+                                color = BentoEmerald,
+                                trackColor = BentoEmeraldLight
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // TOP COST DRIVERS & SPENDING ANALYTICS
+            if (uiState.topCostDriverAmount > 0) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, BentoCardBorder, RoundedCornerShape(24.dp))
+                        .testTag("stat_cost_drivers_card"),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                ) {
+                    Column(modifier = Modifier.padding(18.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "🔥 TOP COST DRIVERS & ANALYTICS",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = BentoRose,
+                                letterSpacing = 0.5.sp
+                            )
+                            Text(
+                                text = "${uiState.topCostDriverPercentage.toInt()}% of spending",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = BentoRose
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Card(
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(16.dp),
+                                colors = CardDefaults.cardColors(containerColor = BentoRose.copy(alpha = 0.12f))
+                            ) {
+                                Column(modifier = Modifier.padding(12.dp)) {
+                                    Text("Biggest Category", style = MaterialTheme.typography.labelSmall, color = BentoRose)
+                                    Text(
+                                        text = uiState.topCostDriverCategory,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    Text(
+                                        text = "$symbol${uiState.topCostDriverAmount.toInt()}",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = BentoRose
+                                    )
+                                }
+                            }
+
+                            if (uiState.highestSingleTransactionAmount > 0) {
+                                Card(
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(16.dp),
+                                    colors = CardDefaults.cardColors(containerColor = BentoAmberLight)
+                                ) {
+                                    Column(modifier = Modifier.padding(12.dp)) {
+                                        Text("Single Biggest Expense", style = MaterialTheme.typography.labelSmall, color = BentoAmber)
+                                        Text(
+                                            text = uiState.highestSingleTransactionDesc,
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        Text(
+                                            text = "$symbol${uiState.highestSingleTransactionAmount.toInt()}",
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            color = BentoAmber
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            // RECURRING INFLOW & INCOME STREAMS CARD
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(24.dp))
+                    .testTag("stat_recurring_income_card"),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+            ) {
+                Column(modifier = Modifier.padding(18.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "💵 RECURRING MONTHLY INFLOW",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = BentoEmerald,
+                            letterSpacing = 0.5.sp,
+                            modifier = Modifier.weight(1f, fill = false)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(BentoEmerald.copy(alpha = 0.15f))
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = "Est: $symbol${uiState.totalProjectedMonthlyInflow.toInt()}",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = BentoEmerald
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    if (uiState.recurringIncomeStreams.isEmpty()) {
+                        Text(
+                            text = "No recurring income logged yet. When adding income in Ledger, toggle 'Recurring Income' (Daily, Weekly, or Monthly) to calculate automatic monthly inflow projections.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    } else {
+                        Text(
+                            text = "Active Income Streams:",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            uiState.recurringIncomeStreams.forEach { stream ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(BentoEmerald.copy(alpha = 0.12f))
+                                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                        ) {
+                                            Text(
+                                                text = stream.title,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.onSurface
+                                            )
+                                            Box(
+                                                modifier = Modifier
+                                                    .clip(RoundedCornerShape(6.dp))
+                                                    .background(BentoEmeraldLight)
+                                                    .padding(horizontal = 4.dp, vertical = 1.dp)
+                                            ) {
+                                                Text(
+                                                    text = stream.frequency,
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                    fontSize = 10.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = BentoEmerald
+                                                )
+                                            }
+                                        }
+                                        Text(
+                                            text = "Base: $symbol${stream.baseAmount.toInt()} / ${stream.frequency.lowercase()}",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                    Column(horizontalAlignment = Alignment.End) {
+                                        Text(
+                                            text = "+$symbol${stream.projectedMonthlyInflow.toInt()}/mo",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            color = BentoEmerald
+                                        )
+                                        Text(
+                                            text = "Logged: $symbol${stream.totalLogged.toInt()}",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.outline
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Bento Grid Block 3: Loans & Debt Summary Dark Bento Card
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onNavigateToLoans() }
+                    .testTag("stat_loans_card"),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = BentoDarkCard),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(modifier = Modifier.padding(18.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Payments,
+                                contentDescription = null,
+                                tint = BentoIndigoContainer,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "LOANS & DEBT SUMMARY",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = BentoIndigoContainer,
+                                letterSpacing = 0.5.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+
+                        Text(
+                            text = "${uiState.daysLogged} days logged",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White.copy(alpha = 0.6f)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "I Owe (Borrowed)",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White.copy(alpha = 0.7f)
+                            )
+                            Text(
+                                text = "$symbol${totalIOwe.toInt()}",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = BentoRose,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Column(
+                            horizontalAlignment = Alignment.End,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "Owed To Me (Lent)",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White.copy(alpha = 0.7f)
+                            )
+                            Text(
+                                text = "$symbol${totalOwedToMe.toInt()}",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = BentoEmerald,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Financial Tasks & Reminders Card
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, BentoCardBorder, RoundedCornerShape(20.dp)),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ListAlt,
+                                contentDescription = null,
+                                tint = BentoIndigoPrimary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "FINANCIAL TASKS",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                letterSpacing = 0.5.sp
+                            )
+                        }
+
+                        OutlinedButton(
+                            onClick = { showAddTaskDialog = true },
+                            shape = RoundedCornerShape(10.dp),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, BentoIndigoPrimary)
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(14.dp), tint = BentoIndigoPrimary)
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Add Task", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = BentoIndigoPrimary)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    if (tasks.isEmpty()) {
+                        Text(
+                            text = "No financial tasks yet. Tap 'Add Task' to list upcoming bills, savings deposits, or loan repayments.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    } else {
+                        tasks.take(5).forEach { task ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Checkbox(
+                                    checked = task.isCompleted,
+                                    onCheckedChange = { viewModel.toggleTaskCompleted(task) },
+                                    colors = CheckboxDefaults.colors(checkedColor = BentoIndigoPrimary)
+                                )
+
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = task.title,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None,
+                                        color = if (task.isCompleted) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    if (task.dueDate.isNotBlank() || task.category.isNotBlank()) {
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            if (task.category.isNotBlank()) {
+                                                Text(
+                                                    text = task.category,
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                    color = BentoIndigoPrimary,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                            if (task.dueDate.isNotBlank()) {
+                                                Text(
+                                                    text = "• ${task.dueDate}",
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+
+                                IconButton(
+                                    onClick = { viewModel.deleteTask(task.id) },
+                                    modifier = Modifier.size(28.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "Delete task",
+                                        tint = CoralExpense.copy(alpha = 0.7f),
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Bento Dynamic Insight Banner Card
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onNavigateToLedger() },
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = BentoIndigoLight),
+                border = androidx.compose.foundation.BorderStroke(1.dp, BentoIndigoContainer)
+            ) {
+                Row(
+                    modifier = Modifier.padding(14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(BentoIndigoContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Lightbulb,
+                            contentDescription = "Insight",
+                            tint = BentoIndigoPrimary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "BUDGET INSIGHT",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = BentoIndigoPrimary
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = uiState.insightMessage,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Doughnut Chart Bento Box
+            DoughnutChart(
+                spentAmount = uiState.totalSpentTillToday,
+                remainingAmount = (uiState.initialAmount - uiState.totalSpentTillToday).coerceAtLeast(0.0),
+                currencySymbol = symbol,
+                onChartClick = onNavigateToLedger
+            )
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Category Bar Charts
+            CategoryBarChart(
+                title = "Spent vs Categories",
+                items = uiState.categorySpendList,
+                currencySymbol = symbol,
+                onCategoryClick = { _ -> onNavigateToLedger() }
+            )
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            CategoryBarChart(
+                title = "Sub-Category Breakdown",
+                items = uiState.subCategorySpendList,
+                currencySymbol = symbol,
+                onCategoryClick = { _ -> onNavigateToLedger() }
+            )
+
+            Spacer(modifier = Modifier.height(120.dp))
+        }
+
+        // Floating Action Button
+        FloatingActionButton(
+            onClick = onAddExpenseClick,
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(bottom = 28.dp, end = 20.dp)
+                .testTag("fab_add_transaction")
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Add Transaction")
+        }
+    }
+
+    // Profile Setup Dialog
+    if (showProfileSetupDialog) {
+        var nameInput by remember { mutableStateOf(rawProfileName) }
+        var cashInput by remember { mutableStateOf(uiState.initialAmount.toInt().toString()) }
+        var targetSavingsInput by remember { mutableStateOf((userSettings?.targetSavings ?: 0.0).toInt().toString()) }
+        var targetBudgetInput by remember { mutableStateOf((userSettings?.targetBudget ?: 0.0).toInt().toString()) }
+        var dayInput by remember { mutableStateOf((userSettings?.salaryDay ?: 1).toString()) }
+        var currInput by remember { mutableStateOf(symbol) }
+        var frequencyInput by remember { mutableStateOf(userSettings?.incomeFrequency ?: "Monthly") }
+
+        AlertDialog(
+            onDismissRequest = { showProfileSetupDialog = false },
+            title = { Text("TakaKoi Budget & Targets Setup", fontWeight = FontWeight.Bold) },
+            text = {
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    OutlinedTextField(
+                        value = nameInput,
+                        onValueChange = { nameInput = it },
+                        label = { Text("Your Name") },
+                        placeholder = { Text("e.g. Alex") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    OutlinedTextField(
+                        value = cashInput,
+                        onValueChange = { cashInput = it },
+                        label = { Text("Starting Wallet Cash / Monthly Income") },
+                        placeholder = { Text("e.g. 25000") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    OutlinedTextField(
+                        value = targetBudgetInput,
+                        onValueChange = { targetBudgetInput = it },
+                        label = { Text("Target Spend Budget Limit for Month") },
+                        placeholder = { Text("e.g. 18000") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    OutlinedTextField(
+                        value = targetSavingsInput,
+                        onValueChange = { targetSavingsInput = it },
+                        label = { Text("Target Monthly Savings Goal") },
+                        placeholder = { Text("e.g. 5000") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    OutlinedTextField(
+                        value = dayInput,
+                        onValueChange = { dayInput = it },
+                        label = { Text("Payday / Salary Day of Month (1-31)") },
+                        placeholder = { Text("1") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Text("Primary Income Recurrence:", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        listOf("Monthly", "Weekly", "Daily", "Business").forEach { freq ->
+                            FilterChip(
+                                selected = frequencyInput == freq,
+                                onClick = { frequencyInput = freq },
+                                label = { Text(freq, fontSize = 11.sp) }
+                            )
+                        }
+                    }
+
+                    Text("Preferred Currency Symbol:", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        listOf("৳", "$", "₹", "€", "£").forEach { c ->
+                            FilterChip(
+                                selected = currInput == c,
+                                onClick = { currInput = c },
+                                label = { Text(c, fontWeight = FontWeight.Bold) }
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val cash = cashInput.toDoubleOrNull() ?: 0.0
+                        val targetSavings = targetSavingsInput.toDoubleOrNull() ?: 0.0
+                        val targetBudget = targetBudgetInput.toDoubleOrNull() ?: 0.0
+                        val day = (dayInput.toIntOrNull() ?: 1).coerceIn(1, 31)
+                        viewModel.updateUserSettings(
+                            userName = nameInput,
+                            initialCash = cash,
+                            salaryDay = day,
+                            currencySymbol = currInput,
+                            targetSavings = targetSavings,
+                            targetBudget = targetBudget,
+                            incomeFrequency = frequencyInput
+                        )
+                        showProfileSetupDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = BentoIndigoPrimary)
+                ) {
+                    Text("Save Settings")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showProfileSetupDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    // Add Task Dialog
+    if (showAddTaskDialog) {
+        var taskTitle by remember { mutableStateOf("") }
+        var taskCategory by remember { mutableStateOf("Bills") }
+        var taskDueDate by remember { mutableStateOf("") }
+        var taskPriority by remember { mutableStateOf("Medium") }
+
+        AlertDialog(
+            onDismissRequest = { showAddTaskDialog = false },
+            title = { Text("Add Financial Task", fontWeight = FontWeight.Bold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    OutlinedTextField(
+                        value = taskTitle,
+                        onValueChange = { taskTitle = it },
+                        label = { Text("Task Description") },
+                        placeholder = { Text("e.g. Pay Internet Bill") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    OutlinedTextField(
+                        value = taskDueDate,
+                        onValueChange = { taskDueDate = it },
+                        label = { Text("Due Date / Timeframe") },
+                        placeholder = { Text("e.g. In 3 days / 15th of Month") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Text("Category:", style = MaterialTheme.typography.bodySmall)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        listOf("Bills", "Savings", "Loans", "General").forEach { cat ->
+                            FilterChip(
+                                selected = taskCategory == cat,
+                                onClick = { taskCategory = cat },
+                                label = { Text(cat, fontSize = 11.sp) }
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (taskTitle.isNotBlank()) {
+                            viewModel.addTask(
+                                title = taskTitle,
+                                category = taskCategory,
+                                dueDate = taskDueDate,
+                                priority = taskPriority
+                            )
+                        }
+                        showAddTaskDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = BentoIndigoPrimary)
+                ) {
+                    Text("Add Task")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showAddTaskDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+}

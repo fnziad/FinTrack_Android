@@ -7,6 +7,7 @@ pluginManagement {
         includeGroupByRegex("androidx.*")
       }
     }
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     mavenCentral()
     gradlePluginPortal()
   }
@@ -18,6 +19,7 @@ dependencyResolutionManagement {
   repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
   repositories {
     google()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     mavenCentral()
   }
 }
@@ -25,3 +27,4 @@ dependencyResolutionManagement {
 rootProject.name = "TakaKoi"
 
 include(":app")
+include(":shared")
