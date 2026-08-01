@@ -21,7 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Savings
-import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -324,7 +324,7 @@ fun SavingsGoalCard(
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.TrendingUp,
+                    imageVector = Icons.AutoMirrored.Filled.TrendingUp,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.padding(end = 6.dp)

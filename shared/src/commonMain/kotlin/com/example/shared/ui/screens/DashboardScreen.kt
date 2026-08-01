@@ -31,7 +31,7 @@ import androidx.compose.material.icons.filled.CheckCircleOutline
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.ListAlt
+import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
@@ -931,7 +931,7 @@ fun DashboardScreen(
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
-                                imageVector = Icons.Default.ListAlt,
+                                imageVector = Icons.AutoMirrored.Filled.ListAlt,
                                 contentDescription = null,
                                 tint = BentoIndigoPrimary,
                                 modifier = Modifier.size(20.dp)

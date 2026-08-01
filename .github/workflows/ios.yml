@@ -2,9 +2,9 @@ name: iOS Framework Build
 
 on:
   push:
-    branches: [ main, feature/ios-kmp ]
+    branches: [ "main", "master", "feature/ios-kmp" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main", "master" ]
 
 jobs:
   build-ios:
@@ -15,21 +15,47 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up JDK 21
+        id: setup-java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
+          cache: 'gradle'
 
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Build KMP shared iOS framework (Simulator & Arm64)
-        run: |
-          ./gradlew :shared:linkReleaseFrameworkIosSimulatorArm64
-          ./gradlew :shared:linkReleaseFrameworkIosArm64
+      - name: Create .env from example
+        run: cp -n .env.example .env || touch .env
 
-      - name: Upload Shared Framework Artifact
+      - name: Build KMP shared iOS framework — Simulator (iosSimulatorArm64)
+        env:
+          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
+        run: |
+          ./gradlew :shared:linkReleaseFrameworkIosSimulatorArm64 \
+            --no-configuration-cache \
+            --no-daemon \
+            --stacktrace
+
+      - name: Build KMP shared iOS framework — Device (iosArm64)
+        env:
+          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
+        run: |
+          ./gradlew :shared:linkReleaseFrameworkIosArm64 \
+            --no-configuration-cache \
+            --no-daemon \
+            --stacktrace
+
+      - name: Upload Simulator Framework Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: shared-ios-framework
+          name: shared-ios-framework-simulator
           path: shared/build/bin/iosSimulatorArm64/releaseFramework/
+          retention-days: 7
+
+      - name: Upload Device Framework Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: shared-ios-framework-device
+          path: shared/build/bin/iosArm64/releaseFramework/
+          retention-days: 7

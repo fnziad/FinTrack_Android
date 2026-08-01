@@ -1,19 +1,42 @@
-*.iml
-.gradle
-.kotlin
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+# IDE & System Files
 .DS_Store
+.idea/
+*.iml
+.idea/caches
+.idea/libraries
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+
+# Gradle & Build Outputs
+.gradle/
+.kotlin/
+build/
+**/build/
 /build
+/app/build
+/shared/build
+/iosApp/build
 /captures
 .externalNativeBuild
 .cxx
+
+# KSP Caches & Generated Code
+**/kspCaches/
+**/generated/
+
+# iOS & Xcode Artifacts
+iosApp/DerivedData/
+iosApp/iosApp.xcodeproj/project.xcworkspace/xcuserdata/
+iosApp/iosApp.xcodeproj/xcuserdata/
+*.xcuserstate
+.swiftpm/
+
+# Local Configuration & Secrets
 local.properties
 .env
 debug.keystore
-*.png
+
+# Temporary Verification Files
+kmp_ios_*.png
