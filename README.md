@@ -7,7 +7,15 @@
 
 ---
 
-## 📸 Screenshots
+## 📸 Interface & Screenshots
+
+### 🍏 iOS App Interface (Compose Multiplatform on iOS)
+
+<p align="center">
+  <img src="docs/screenshots/ios_preview.png" alt="iOS App Preview" width="360" />
+</p>
+
+### 🤖 Android App Screens
 
 | Dashboard | Ledger | Savings |
 |:-:|:-:|:-:|
