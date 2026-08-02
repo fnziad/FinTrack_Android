@@ -6,9 +6,9 @@ import androidx.compose.ui.graphics.Color
 val PremiumBlack      = Color(0xFF111827)   // Quiet ink
 val PremiumInk        = Color(0xFF111118)   // Deep ink card
 val PremiumCharcoal   = Color(0xFF1A1A27)   // Slightly lighter dark surface
-val PremiumSlate      = Color(0xFF6B7280)   // Muted label text
+val PremiumSlate      = Color(0xFF4B5563)   // Muted label text — readable on porcelain
 
-val PremiumBg         = Color(0xFFFAF9F7)   // Warm porcelain
+val PremiumBg         = Color(0xFFFFFDFC)   // Warm porcelain
 val PremiumSurface    = Color(0xFFFFFFFF)   // Pure white card
 val PremiumBorder     = Color(0xFFEAE9E6)   // Very subtle warm border
 

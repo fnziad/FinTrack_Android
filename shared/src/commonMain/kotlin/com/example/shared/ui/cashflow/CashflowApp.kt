@@ -1,6 +1,7 @@
 package com.example.shared.ui.cashflow
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -58,6 +59,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -201,7 +204,20 @@ private fun HomeScreen(viewModel: CashflowViewModel, onAccount: () -> Unit, onRe
                 }
             }
         }
+        item {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                MetricCard("Payday", "${home.metrics.daysUntilPayday} days", Modifier.weight(1f))
+                MetricCard("Spent today", money(home.metrics.spentToday, symbol), Modifier.weight(1f))
+                MetricCard("Daily avg", money(home.metrics.dailyAverage, symbol), Modifier.weight(1f))
+            }
+        }
         home.plan?.let { plan -> item { PaceCard(plan, symbol) } }
+        item {
+            CashRunwayCard(home.metrics.cashRunwayDays, home.totalBalance, home.metrics.dailyAverage, symbol)
+        }
+        if (home.metrics.projectedMonthlyInflow > 0) item {
+            SimpleRow("Recurring monthly inflow", money(home.metrics.projectedMonthlyInflow, symbol))
+        }
         if (home.pendingCount > 0) item {
             Card(
                 modifier = Modifier.fillMaxWidth().clickable(onClick = onReview), shape = CardShape,
@@ -220,6 +236,9 @@ private fun HomeScreen(viewModel: CashflowViewModel, onAccount: () -> Unit, onRe
         item { SectionLabel("Recent activity") }
         if (home.recentTransactions.isEmpty()) item { EmptyCard("Your first money moment starts here", "Tap + to quickly record income or spending.") }
         items(home.recentTransactions, key = { "recent-transaction-${it.id}" }) { transaction -> TransactionRow(transaction, symbol, null, onClick = {}) }
+        if (home.metrics.categoryRanks.isNotEmpty()) item {
+            CategoryRankingCard(home.metrics.categoryRanks, home.metrics.totalSpent, symbol)
+        }
         home.nextGoal?.let { goal -> item { PriorityCard("Next goal", goal.title, "${money(goal.currentAmount, symbol)} of ${money(goal.targetAmount, symbol)}", Icons.Default.Savings) } }
         home.nextLoan?.let { loan -> item { PriorityCard("Upcoming debt", loan.title, "${money(loan.amount - loan.paidAmount, symbol)} remaining", Icons.AutoMirrored.Filled.Assignment) } }
     }
@@ -228,12 +247,71 @@ private fun HomeScreen(viewModel: CashflowViewModel, onAccount: () -> Unit, onRe
 @Composable
 private fun PaceCard(plan: PlanProgress, symbol: String) {
     Card(shape = CardShape, colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(0.dp)) {
-        Column(Modifier.padding(20.dp)) {
-            Text(plan.name.uppercase(), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Spacer(Modifier.height(8.dp))
-            Text("${money(plan.safeToSpendToday, symbol)} safe today", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(4.dp))
-            Text("${money(plan.remaining, symbol)} of ${money(plan.limit, symbol)} remains • ${plan.daysRemaining} days", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Row(Modifier.fillMaxWidth().padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(plan.name.uppercase(), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(Modifier.height(8.dp))
+                Text("${money(plan.safeToSpendToday, symbol)} safe today", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(4.dp))
+                Text("${money(plan.remaining, symbol)} remaining • ${plan.daysRemaining} days", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("${money(plan.spent, symbol)} spent of ${money(plan.limit, symbol)}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Box(Modifier.size(78.dp), contentAlignment = Alignment.Center) {
+                Canvas(Modifier.fillMaxSize()) {
+                    val stroke = 9.dp.toPx()
+                    drawArc(PremiumVioletSoft, -90f, 360f, false, style = Stroke(stroke, cap = StrokeCap.Round))
+                    drawArc(PremiumViolet, -90f, (plan.spent / plan.limit).coerceIn(0.0, 1.0).toFloat() * 360f, false, style = Stroke(stroke, cap = StrokeCap.Round))
+                }
+                Text("${((plan.spent / plan.limit) * 100).toInt()}%", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+
+@Composable
+private fun MetricCard(label: String, value: String, modifier: Modifier = Modifier) {
+    Card(modifier = modifier, shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
+        Column(Modifier.padding(horizontal = 12.dp, vertical = 14.dp)) {
+            Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Spacer(Modifier.height(5.dp))
+            Text(value, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+    }
+}
+
+@Composable
+private fun CashRunwayCard(runwayDays: Int?, balance: Double, dailyAverage: Double, symbol: String) {
+    Card(shape = CardShape, colors = CardDefaults.cardColors(containerColor = PremiumVioletSoft)) {
+        Column(Modifier.padding(18.dp)) {
+            Text("Cash runway", style = MaterialTheme.typography.labelMedium, color = PremiumViolet)
+            Spacer(Modifier.height(5.dp))
+            Text(
+                runwayDays?.let { "Your ${money(balance, symbol)} can last about $it days" } ?: "Log spending to see how long your balance can last",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            if (dailyAverage > 0) Text("Based on your ${money(dailyAverage, symbol)} daily average.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
+
+@Composable
+private fun CategoryRankingCard(ranks: List<CategoryRank>, totalSpent: Double, symbol: String) {
+    Card(shape = CardShape, colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
+        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text("Where your money went", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text("This month • ${money(totalSpent, symbol)} spent", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            ranks.forEach { rank ->
+                Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text(rank.name, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+                        Text(money(rank.amount, symbol), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                    }
+                    Box(Modifier.fillMaxWidth().height(7.dp).clip(CircleShape).background(PremiumVioletSoft)) {
+                        Box(Modifier.fillMaxWidth(rank.share).height(7.dp).clip(CircleShape).background(PremiumViolet))
+                    }
+                }
+            }
         }
     }
 }

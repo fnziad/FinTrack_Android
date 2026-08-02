@@ -28,7 +28,16 @@ data class HomeUiState(
     val pendingCount: Int = 0,
     val recentTransactions: List<TransactionEntity> = emptyList(),
     val nextGoal: SavingsGoalEntity? = null,
-    val nextLoan: LoanEntity? = null
+    val nextLoan: LoanEntity? = null,
+    val metrics: HomeMetrics = HomeMetrics()
+)
+
+private data class CashflowInputs(
+    val accounts: List<AccountEntity>,
+    val transactions: List<TransactionEntity>,
+    val plans: List<SpendingPlanEntity>,
+    val streams: List<IncomeStreamEntity>,
+    val settings: UserSettingsEntity?
 )
 
 class CashflowViewModel : ViewModel() {
@@ -54,17 +63,28 @@ class CashflowViewModel : ViewModel() {
     val tasks = repository.tasks.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     val incomeStreams = repository.incomeStreams.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    val home: StateFlow<HomeUiState> = combine(accounts, transactions, plans, goals, loans) { allAccounts, allTransactions, allPlans, allGoals, allLoans ->
-        val balances = CashflowCalculations.balances(allAccounts, allTransactions)
-        val activePlan = allPlans.firstOrNull { it.isActive }
+    private val cashflowInputs = combine(accounts, transactions, plans, incomeStreams, settings) { allAccounts, allTransactions, allPlans, allStreams, currentSettings ->
+        CashflowInputs(allAccounts, allTransactions, allPlans, allStreams, currentSettings)
+    }
+
+    val home: StateFlow<HomeUiState> = combine(cashflowInputs, goals, loans) { inputs, allGoals, allLoans ->
+        val balances = CashflowCalculations.balances(inputs.accounts, inputs.transactions)
+        val totalBalance = balances.sumOf { it.balance }
+        val activePlan = inputs.plans.firstOrNull { it.isActive }
         HomeUiState(
             balances = balances,
-            totalBalance = balances.sumOf { it.balance },
-            plan = CashflowCalculations.activePlanProgress(activePlan, allTransactions),
-            pendingCount = CashflowCalculations.pendingCount(allTransactions),
-            recentTransactions = allTransactions.take(5),
+            totalBalance = totalBalance,
+            plan = CashflowCalculations.activePlanProgress(activePlan, inputs.transactions),
+            pendingCount = CashflowCalculations.pendingCount(inputs.transactions),
+            recentTransactions = inputs.transactions.take(5),
             nextGoal = allGoals.minByOrNull { it.targetDateEpochMillis },
-            nextLoan = allLoans.filterNot { it.isSettled }.minByOrNull { it.dueDateEpochMillis }
+            nextLoan = allLoans.filterNot { it.isSettled }.minByOrNull { it.dueDateEpochMillis },
+            metrics = CashflowCalculations.homeMetrics(
+                transactions = inputs.transactions,
+                incomeStreams = inputs.streams,
+                totalBalance = totalBalance,
+                salaryDay = inputs.settings?.salaryDay ?: 1
+            )
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState())
 
