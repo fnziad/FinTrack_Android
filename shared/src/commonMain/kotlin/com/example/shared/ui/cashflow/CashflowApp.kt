@@ -219,7 +219,7 @@ private fun HomeScreen(viewModel: CashflowViewModel, onAccount: () -> Unit, onRe
         }
         item { SectionLabel("Recent activity") }
         if (home.recentTransactions.isEmpty()) item { EmptyCard("Your first money moment starts here", "Tap + to quickly record income or spending.") }
-        items(home.recentTransactions, key = { it.id }) { transaction -> TransactionRow(transaction, symbol, null, onClick = {}) }
+        items(home.recentTransactions, key = { "recent-transaction-${it.id}" }) { transaction -> TransactionRow(transaction, symbol, null, onClick = {}) }
         home.nextGoal?.let { goal -> item { PriorityCard("Next goal", goal.title, "${money(goal.currentAmount, symbol)} of ${money(goal.targetAmount, symbol)}", Icons.Default.Savings) } }
         home.nextLoan?.let { loan -> item { PriorityCard("Upcoming debt", loan.title, "${money(loan.amount - loan.paidAmount, symbol)} remaining", Icons.AutoMirrored.Filled.Assignment) } }
     }
@@ -263,7 +263,7 @@ private fun ActivityScreen(viewModel: CashflowViewModel) {
             }
         }
         if (shown.isEmpty()) item { EmptyCard(if (reviewOnly) "Nothing needs review" else "No activity yet", if (reviewOnly) "All captured entries have a wallet." else "Use + to record your first money moment.") }
-        items(shown, key = { it.id }) { transaction ->
+        items(shown, key = { "activity-transaction-${it.id}" }) { transaction ->
             val account = accounts.firstOrNull { it.id == transaction.accountId }
             TransactionRow(transaction, symbol, account?.name, onClick = { if (transaction.status == "PENDING_SOURCE") assigning = transaction })
         }
@@ -301,25 +301,25 @@ private fun PlanScreen(viewModel: CashflowViewModel) {
         }
         item { SectionAction("Wallets", "Add wallet", { showWallet = true }) }
         if (balances.isEmpty()) item { EmptyCard("No wallets yet", "Add cash, bank, card or mobile-wallet balances.") }
-        items(balances, key = { it.account.id }) { balance -> AccountRow(balance, symbol) }
+        items(balances, key = { "account-${it.account.id}" }) { balance -> AccountRow(balance, symbol) }
         item { TextButton(onClick = { showTransfer = true }, enabled = accounts.size > 1) { Text("Transfer money between wallets") } }
         item { SectionAction("Spending plans", "New plan", { showPlan = true }) }
         if (plans.isEmpty()) item { EmptyCard("Set a limit that fits your cycle", "Choose weekly, monthly, payday or a custom plan.") }
-        items(plans, key = { it.id }) { plan ->
+        items(plans, key = { "plan-${it.id}" }) { plan ->
             CashflowCalculations.activePlanProgress(plan, transactions)?.let { PaceCard(it, symbol) }
         }
         item { SectionAction("Income streams", "Add income", { showIncome = true }) }
         if (streams.isEmpty()) item { EmptyCard("Income can be flexible", "Add salary, allowance, tuition, freelancing or any custom stream.") }
-        items(streams, key = { it.id }) { stream -> SimpleRow(stream.name, "${stream.frequency.lowercase().replaceFirstChar { it.uppercase() }} • ${money(stream.amount, symbol)}") }
+        items(streams, key = { "income-stream-${it.id}" }) { stream -> SimpleRow(stream.name, "${stream.frequency.lowercase().replaceFirstChar { it.uppercase() }} • ${money(stream.amount, symbol)}") }
         item { SectionAction("Goals", "Add goal", { showGoal = true }) }
         if (goals.isEmpty()) item { EmptyCard("Make room for a goal", "Savings goals will live here.") }
-        items(goals, key = { it.id }) { goal -> SimpleRow(goal.title, "${money(goal.currentAmount, symbol)} of ${money(goal.targetAmount, symbol)}") }
+        items(goals, key = { "goal-${it.id}" }) { goal -> SimpleRow(goal.title, "${money(goal.currentAmount, symbol)} of ${money(goal.targetAmount, symbol)}") }
         item { SectionAction("Debt and lending", "Add debt", { showDebt = true }) }
         if (loans.isEmpty()) item { EmptyCard("Keep promises visible", "Track what you owe and what people owe you.") }
-        items(loans, key = { it.id }) { loan -> DebtRow(loan, symbol) }
+        items(loans, key = { "loan-${it.id}" }) { loan -> DebtRow(loan, symbol) }
         item { SectionAction("Financial tasks", "Add task", { showTask = true }) }
         if (tasks.isEmpty()) item { EmptyCard("Keep one promise visible", "Add a bill, reminder, or a money task.") }
-        items(tasks, key = { it.id }) { task -> SimpleRow(task.title, task.dueDate.ifBlank { "No due date" }) }
+        items(tasks, key = { "task-${it.id}" }) { task -> SimpleRow(task.title, task.dueDate.ifBlank { "No due date" }) }
     }
     if (showWallet) AddWalletSheet(viewModel, { showWallet = false })
     if (showPlan) AddPlanSheet(viewModel, { showPlan = false })
