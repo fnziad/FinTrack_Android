@@ -5,7 +5,7 @@
 
 TakaKoi is an Android and iOS personal-finance app built with Kotlin Multiplatform and Compose Multiplatform. It tracks expenses, budgets, savings goals, loans, and recurring income with a local-first Room database.
 
-The repository is open source, but the current CI artifacts are development/integration builds. Store distribution is not configured yet; see [Release readiness](#release-readiness).
+The repository is open source, but the current CI artifacts are development/integration builds. Store distribution is not configured.
 
 ## Screenshots
 
@@ -45,7 +45,7 @@ See [PRIVACY.md](PRIVACY.md) for the user-data boundary and [SECURITY.md](SECURI
 | Date/time | `kotlinx-datetime` |
 | Build | Gradle 9.3.1, AGP 9.1.1, Kotlin/JVM 2.2.10, KMP 2.0.21, Java 21 |
 
-Ktor remains a dependency planned for a future sync feature; there are no current runtime HTTP calls.
+Ktor is not used by the current runtime; there are no current runtime HTTP calls.
 
 ## Branches and CI
 
@@ -55,7 +55,7 @@ Ktor remains a dependency planned for a future sync feature; there are no curren
 | `develop` | Active development | `TakaKoi-Preview-Debug-APK` and unsigned iOS framework integration artifacts (14 days) |
 | `feature/*`, `fix/*` | Short-lived pull-request branches | CI validation only |
 
-Both workflows run on pushes to `main`/`develop` and pull requests targeting those branches. The Android workflow deliberately builds `assembleDebug` so it never handles a production signing key. The resulting APK is useful for testing only; it is not a Play Store release. The iOS workflow builds unsigned simulator/device frameworks and an unsigned simulator container; TestFlight/App Store signing is a separate future release step.
+Both workflows run on pushes to `main`/`develop` and pull requests targeting those branches.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution flow.
 
@@ -88,7 +88,7 @@ git checkout develop
 ./gradlew :app:installDebug
 ```
 
-The debug build uses a locally generated debug keystore when needed. Never reuse it for a store release.
+The debug build uses a locally generated debug keystore when needed.
 
 ### iOS
 
@@ -96,42 +96,7 @@ The debug build uses a locally generated debug keystore when needed. Never reuse
 ./gradlew :shared:linkReleaseFrameworkIosSimulatorArm64 --no-configuration-cache
 ```
 
-Open `iosApp/iosApp.xcodeproj` in Xcode and run an iOS Simulator target. The project intentionally has no committed Apple Developer Team ID; configure signing locally or in a protected release workflow.
-
-## CI/CD details
-
-### Android (`.github/workflows/android.yml`)
-
-- Ubuntu runner with Temurin JDK 21
-- Read-only repository permissions
-- Generates a throwaway debug keystore in CI
-- Uploads debug APK artifacts only; no release signing secrets are used
-
-### iOS (`.github/workflows/ios.yml`)
-
-- macOS runner with Temurin JDK 21
-- Builds complete Release KMP frameworks for simulator and device
-- Builds the Xcode container with code signing disabled
-- Uploads integration artifacts only; provisioning profiles and App Store certificates are intentionally absent
-
-## Release readiness
-
-Before publishing to Google Play or the App Store, complete all of the following:
-
-1. Review the privacy boundary and publish accurate Play Data Safety/App Store privacy disclosures.
-2. Add an encrypted, user-consented sync/export design if cloud backup is introduced.
-3. Configure production package/bundle IDs, version codes, signing certificates, provisioning profiles, and protected CI secrets.
-4. Build and sign an Android App Bundle and iOS archive/TestFlight build in a separate protected workflow.
-5. Add the required iOS privacy manifest and verify third-party dependency/font notices.
-6. Tag the exact reviewed commit and attach release notes; do not treat CI debug artifacts as production binaries.
-
-## Roadmap
-
-- Push notifications for payday reminders
-- Optional encrypted sync and backup
-- Recurring transaction automation
-- CSV/PDF exports
-- TestFlight distribution
+Open `iosApp/iosApp.xcodeproj` in Xcode and run an iOS Simulator target.
 
 ## License
 
